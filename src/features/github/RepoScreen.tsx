@@ -4,6 +4,7 @@ import { GridSection } from '../../components/GridSection';
 import { Screen } from '../../components/Screen';
 import { SquareGrid } from '../../components/SquareGrid';
 import { githubPath, openInGitHub } from './api';
+import { IssueContextMenu, ReleaseContextMenu, TagContextMenu } from './contextMenus';
 import { useGitHubList } from './hooks';
 import { IssueLegend, ReleaseLegend, TagLegend } from './legends';
 import { IssuePreview, ReleasePreview, TagPreview } from './previews';
@@ -82,6 +83,7 @@ export function RepoScreen({ repo }: { repo: Repo }) {
                       getStatus={issueSquareStatus}
                       onPick={setItem}
                       renderPreview={(i) => <IssuePreview item={i} />}
+                      renderContextMenu={(i) => <IssueContextMenu item={i} />}
                     />
                   </>
                 )
@@ -102,6 +104,7 @@ export function RepoScreen({ repo }: { repo: Repo }) {
                       getStatus={issueSquareStatus}
                       onPick={setItem}
                       renderPreview={(i) => <IssuePreview item={i} />}
+                      renderContextMenu={(i) => <IssueContextMenu item={i} />}
                     />
                   </>
                 )
@@ -122,6 +125,7 @@ export function RepoScreen({ repo }: { repo: Repo }) {
                       getStatus={releaseSquareStatus}
                       onPick={(release) => openInGitHub(release.html_url)}
                       renderPreview={(release) => <ReleasePreview release={release} />}
+                      renderContextMenu={(release) => <ReleaseContextMenu release={release} />}
                     />
                   </>
                 )
@@ -142,6 +146,7 @@ export function RepoScreen({ repo }: { repo: Repo }) {
                       getStatus={tagSquareStatus}
                       onPick={(tag) => openInGitHub(tagUrl(repo, tag))}
                       renderPreview={(tag) => <TagPreview repo={repo} tag={tag} />}
+                      renderContextMenu={(tag) => <TagContextMenu repo={repo} tag={tag} />}
                     />
                   </>
                 )

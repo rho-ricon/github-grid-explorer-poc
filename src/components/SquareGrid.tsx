@@ -1,4 +1,5 @@
 import { useMemo, type ReactNode } from 'react';
+import { ContextMenu } from '@base-ui/react/context-menu';
 import { Popover } from '@base-ui/react/popover';
 
 export function SquareGrid<T>({
@@ -8,6 +9,7 @@ export function SquareGrid<T>({
   getStatus,
   onPick,
   renderPreview,
+  renderContextMenu,
 }: {
   items: T[];
   label: string;
@@ -15,6 +17,7 @@ export function SquareGrid<T>({
   getStatus?: (item: T) => string;
   onPick?: (item: T) => void;
   renderPreview: (item: T) => ReactNode;
+  renderContextMenu?: (item: T) => ReactNode;
 }) {
   const popover = useMemo(() => Popover.createHandle<T>(), []);
   const columns = Math.min(10, Math.max(1, Math.ceil(Math.sqrt(items.length || 1))));
@@ -24,10 +27,8 @@ export function SquareGrid<T>({
       <div className="grid" style={{ gridTemplateColumns: `repeat(${columns}, 56px)` }}>
         {items.map((item, index) => {
           const text = getLabel(item);
-
-          return (
+          const square = (
             <Popover.Trigger
-              key={index}
               className="square"
               data-ci={getStatus?.(item)}
               aria-label={`${label}: ${text}`}
@@ -44,6 +45,25 @@ export function SquareGrid<T>({
                 onPick(item);
               }}
             />
+          );
+
+          if (!renderContextMenu) {
+            return <span key={index}>{square}</span>;
+          }
+
+          return (
+            <ContextMenu.Root key={index}>
+              <ContextMenu.Trigger className="squareContext" onContextMenu={() => popover.close()}>
+                {square}
+              </ContextMenu.Trigger>
+              <ContextMenu.Portal>
+                <ContextMenu.Positioner className="contextMenuPositioner">
+                  <ContextMenu.Popup className="contextMenuPopup">
+                    {renderContextMenu(item)}
+                  </ContextMenu.Popup>
+                </ContextMenu.Positioner>
+              </ContextMenu.Portal>
+            </ContextMenu.Root>
           );
         })}
       </div>

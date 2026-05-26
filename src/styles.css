@@ -262,6 +262,57 @@ h2 {
   background: white !important;
 }
 
+.squareContext {
+  width: 56px;
+  height: 56px;
+}
+
+.contextMenuPositioner {
+  z-index: 30;
+}
+
+.contextMenuPopup {
+  min-width: 180px;
+  border: 2px solid black;
+  background: white;
+  padding: 4px;
+  box-shadow: 4px 4px 0 black;
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.contextMenuPopup[data-starting-style],
+.contextMenuPopup[data-ending-style] {
+  opacity: 0;
+  transform: scale(0.97);
+}
+
+.contextMenuItem {
+  padding: 8px 10px;
+  cursor: default;
+  outline: none;
+}
+
+.contextMenuItem[data-highlighted] {
+  background: black;
+  color: white;
+}
+
+.contextMenuSubmenuTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.contextMenuSeparator {
+  height: 1px;
+  margin: 4px;
+  background: black;
+}
+
 .viewport {
   position: fixed;
   z-index: 10;

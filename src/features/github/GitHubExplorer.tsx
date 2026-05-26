@@ -4,6 +4,7 @@ import { GridSection } from '../../components/GridSection';
 import { Screen } from '../../components/Screen';
 import { SquareGrid } from '../../components/SquareGrid';
 import { githubPath, openInGitHub, ORG } from './api';
+import { MemberContextMenu, RepoContextMenu, TeamContextMenu } from './contextMenus';
 import { useGitHubList, useRepoCiStatuses } from './hooks';
 import { CiLegend } from './legends';
 import { MemberPreview, RepoPreview, TeamPreview } from './previews';
@@ -73,6 +74,7 @@ export function GitHubExplorer() {
                     getStatus={(r) => r.ci.state}
                     onPick={(r) => setRepo(r)}
                     renderPreview={(r) => <RepoPreview repo={r} />}
+                    renderContextMenu={(r) => <RepoContextMenu repo={r} />}
                   />
                 </>
               )
@@ -90,6 +92,7 @@ export function GitHubExplorer() {
                   getLabel={(team) => team.name}
                   onPick={(team) => openInGitHub(team.html_url)}
                   renderPreview={(team) => <TeamPreview team={team} />}
+                  renderContextMenu={(team) => <TeamContextMenu team={team} />}
                 />
               )
             )}
@@ -106,6 +109,7 @@ export function GitHubExplorer() {
                   getLabel={(member) => member.login}
                   onPick={(member) => openInGitHub(member.html_url)}
                   renderPreview={(member) => <MemberPreview member={member} />}
+                  renderContextMenu={(member) => <MemberContextMenu member={member} />}
                 />
               )
             )}
