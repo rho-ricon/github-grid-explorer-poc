@@ -13,16 +13,32 @@ import { MemberPreview, RepoPreview, TeamPreview } from './previews';
 import { filterItems, memberSearchText, repoSearchText, teamSearchText } from './search';
 import { memberSquareStatus, teamSquareStatus } from './status';
 import type { Member, Repo, RepoWithCi, Team } from './types';
+import { RepoCompareScreen } from './RepoCompareScreen';
 import { RepoScreen } from './RepoScreen';
 import { TeamScreen } from './TeamScreen';
 import { TokenSettings } from './TokenSettings';
 
+type DraggedSquare =
+  | { type: 'member'; member: Member }
+  | { type: 'repo'; repo: RepoWithCi };
+
 type MemberRepoDropMenuState = {
+  type: 'member-repo';
   member: Member;
   repo: RepoWithCi;
   x: number;
   y: number;
 };
+
+type RepoRepoDropMenuState = {
+  type: 'repo-repo';
+  source: RepoWithCi;
+  target: RepoWithCi;
+  x: number;
+  y: number;
+};
+
+type DropMenuState = MemberRepoDropMenuState | RepoRepoDropMenuState;
 
 export function GitHubExplorer() {
   const repos = useGitHubList<Repo>(
@@ -43,10 +59,13 @@ export function GitHubExplorer() {
     ci: ciByRepo[repo.id] || { state: 'loading', label: 'Loading CI…' },
   }));
   const [selection, setSelection] = useState<
-    { type: 'repo'; repo: Repo; initialQuery?: string } | { type: 'team'; team: Team } | null
+    | { type: 'repo'; repo: Repo; initialQuery?: string }
+    | { type: 'team'; team: Team }
+    | { type: 'repo-compare'; left: RepoWithCi; right: RepoWithCi }
+    | null
   >(null);
-  const [dragged, setDragged] = useState<{ type: 'member'; member: Member } | null>(null);
-  const [dropMenu, setDropMenu] = useState<MemberRepoDropMenuState | null>(null);
+  const [dragged, setDragged] = useState<DraggedSquare | null>(null);
+  const [dropMenu, setDropMenu] = useState<DropMenuState | null>(null);
   const [query, setQuery] = useState('');
   const loading = repos.loading || teams.loading || members.loading;
 
@@ -63,15 +82,29 @@ export function GitHubExplorer() {
     [members.items, query],
   );
 
-  function handleMemberDropOnRepo(repo: RepoWithCi, event: DragEvent<HTMLElement>) {
+  function handleDropOnRepo(repo: RepoWithCi, event: DragEvent<HTMLElement>) {
     if (!dragged) return;
 
-    setDropMenu({
-      member: dragged.member,
-      repo,
-      x: event.clientX,
-      y: event.clientY,
-    });
+    if (dragged.type === 'member') {
+      setDropMenu({
+        type: 'member-repo',
+        member: dragged.member,
+        repo,
+        x: event.clientX,
+        y: event.clientY,
+      });
+    }
+
+    if (dragged.type === 'repo' && dragged.repo.id !== repo.id) {
+      setDropMenu({
+        type: 'repo-repo',
+        source: dragged.repo,
+        target: repo,
+        x: event.clientX,
+        y: event.clientY,
+      });
+    }
+
     setDragged(null);
   }
 
@@ -102,7 +135,9 @@ export function GitHubExplorer() {
                     getLabel={(r) => r.name}
                     getStatus={(r) => r.ci.state}
                     onPick={(repo) => setSelection({ type: 'repo', repo })}
-                    onDrop={dragged ? handleMemberDropOnRepo : undefined}
+                    onDragStart={(repo) => setDragged({ type: 'repo', repo })}
+                    onDragEnd={() => setDragged(null)}
+                    onDrop={dragged ? handleDropOnRepo : undefined}
                     renderPreview={(r) => <RepoPreview repo={r} />}
                     renderContextMenu={(r) => <RepoContextMenu repo={r} />}
                   />
@@ -158,11 +193,15 @@ export function GitHubExplorer() {
         </div>
       </Screen>
 
-      <MemberRepoDropMenu
+      <RelationshipDropMenu
         drop={dropMenu}
         onClose={() => setDropMenu(null)}
         onShowWork={(drop) => {
           setSelection({ type: 'repo', repo: drop.repo, initialQuery: drop.member.login });
+          setDropMenu(null);
+        }}
+        onCompareRepos={(drop) => {
+          setSelection({ type: 'repo-compare', left: drop.source, right: drop.target });
           setDropMenu(null);
         }}
       />
@@ -174,6 +213,9 @@ export function GitHubExplorer() {
               <RepoScreen repo={selection.repo} initialQuery={selection.initialQuery} />
             )}
             {selection?.type === 'team' && <TeamScreen team={selection.team} />}
+            {selection?.type === 'repo-compare' && (
+              <RepoCompareScreen left={selection.left} right={selection.right} />
+            )}
           </Drawer.Popup>
         </Drawer.Viewport>
       </Drawer.Portal>
@@ -181,14 +223,16 @@ export function GitHubExplorer() {
   );
 }
 
-function MemberRepoDropMenu({
+function RelationshipDropMenu({
   drop,
   onClose,
   onShowWork,
+  onCompareRepos,
 }: {
-  drop: MemberRepoDropMenuState | null;
+  drop: DropMenuState | null;
   onClose: () => void;
   onShowWork: (drop: MemberRepoDropMenuState) => void;
+  onCompareRepos: (drop: RepoRepoDropMenuState) => void;
 }) {
   const anchor = useMemo(() => (drop ? pointAnchor(drop.x, drop.y) : null), [drop]);
 
@@ -204,7 +248,7 @@ function MemberRepoDropMenu({
           sideOffset={6}
         >
           <Menu.Popup className="contextMenuPopup">
-            {drop && (
+            {drop?.type === 'member-repo' && (
               <>
                 <div className="dropMenuLabel">
                   {drop.member.login} → {drop.repo.name}
@@ -228,6 +272,32 @@ function MemberRepoDropMenu({
                   }}
                 >
                   Open repo on GitHub
+                </DropMenuItem>
+              </>
+            )}
+
+            {drop?.type === 'repo-repo' && (
+              <>
+                <div className="dropMenuLabel">
+                  {drop.source.name} ↔ {drop.target.name}
+                </div>
+                <DropMenuItem onClick={() => onCompareRepos(drop)}>Compare repo summary</DropMenuItem>
+                <Menu.Separator className="contextMenuSeparator" />
+                <DropMenuItem
+                  onClick={() => {
+                    openInGitHub(drop.source.html_url);
+                    onClose();
+                  }}
+                >
+                  Open source repo
+                </DropMenuItem>
+                <DropMenuItem
+                  onClick={() => {
+                    openInGitHub(drop.target.html_url);
+                    onClose();
+                  }}
+                >
+                  Open target repo
                 </DropMenuItem>
               </>
             )}

@@ -21,6 +21,7 @@ Open http://localhost:5173/.
 - Click a square to drill into full-screen Base UI `Drawer` views.
 - Right-click a square for Base UI `ContextMenu` actions.
 - Drag a member onto a repo for non-mutating relationship actions.
+- Drag a repo onto another repo for a side-by-side operational comparison.
 - Search filters all grids on the current screen.
 - Caches GitHub API responses in browser storage.
 
@@ -92,4 +93,4 @@ GITHUB_PAGES=true bun run build
 ## Possible next experiments
 
 - Use Base UI `Meter` for CI success rate, milestone progress, or activity/freshness.
-- Expand non-mutating drag/drop gestures, such as comparing or pinning arbitrary squares.
+- Expand non-mutating drag/drop gestures, such as pinning arbitrary squares or comparing richer repo detail data.

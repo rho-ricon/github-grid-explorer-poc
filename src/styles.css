@@ -133,6 +133,69 @@ body {
   text-align: center;
 }
 
+.comparePanel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  max-width: 1040px;
+}
+
+.compareCard {
+  width: min(300px, calc(100vw - 48px));
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  border: 2px solid black;
+  padding: 16px;
+  background: white;
+}
+
+.compareKicker {
+  display: block;
+  margin-bottom: 6px;
+  color: #666;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.compareMetrics {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.compareMetric {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid black;
+  padding-top: 8px;
+}
+
+.compareMetric dt,
+.compareMetric dd {
+  margin: 0;
+}
+
+.compareMetric dt {
+  color: #555;
+}
+
+.compareMetric dd {
+  max-width: 180px;
+  text-align: right;
+}
+
+.compareSignals ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
 h1,
 h2,
 p {
@@ -584,13 +647,35 @@ h2 {
   transform: translateY(100%);
 }
 
-.back {
+.back,
+.actionButton {
   border: 2px solid black;
   background: white;
   color: black;
   padding: 8px 12px;
   cursor: pointer;
   text-decoration: none;
+  transition:
+    background 120ms ease,
+    color 120ms ease,
+    box-shadow 120ms ease,
+    transform 120ms ease;
+}
+
+.back:hover,
+.back:focus-visible,
+.actionButton:hover,
+.actionButton:focus-visible {
+  background: white;
+  color: black;
+  box-shadow: 4px 4px 0 black;
+  transform: translate(-2px, -2px);
+}
+
+.back:active,
+.actionButton:active {
+  box-shadow: 1px 1px 0 black;
+  transform: translate(0, 0);
 }
 
 .popoverPositioner {

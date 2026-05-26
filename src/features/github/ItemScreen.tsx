@@ -19,7 +19,7 @@ export function ItemScreen({ repo, item }: { repo: Repo; item: IssueOrPull }) {
         <h2>{item.title}</h2>
         <p>{item.comments} comments</p>
         <p>Updated {formatDate(item.updated_at)}</p>
-        <a className="back" href={item.html_url} target="_blank" rel="noreferrer">
+        <a className="actionButton" href={item.html_url} target="_blank" rel="noreferrer">
           Open on GitHub
         </a>
       </main>

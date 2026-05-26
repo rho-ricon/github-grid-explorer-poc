@@ -55,10 +55,10 @@ export function TokenSettings() {
             </label>
 
             <div className="tokenActions">
-              <Popover.Close className="back" onClick={() => saveToken(draftToken, remember)}>
+              <Popover.Close className="actionButton" onClick={() => saveToken(draftToken, remember)}>
                 Save
               </Popover.Close>
-              <Popover.Close className="back" onClick={clearToken}>
+              <Popover.Close className="actionButton" onClick={clearToken}>
                 Clear
               </Popover.Close>
             </div>
