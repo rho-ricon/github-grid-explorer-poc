@@ -36,6 +36,21 @@ body {
   color: #666;
 }
 
+.search {
+  width: min(320px, 32vw);
+  margin-left: auto;
+  border: 2px solid black;
+  background: white;
+  color: black;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.search:focus {
+  outline: 2px solid black;
+  outline-offset: 2px;
+}
+
 .center {
   min-height: 100dvh;
   display: grid;
@@ -138,6 +153,30 @@ h2 {
   outline-offset: -4px;
 }
 
+.legend span[data-ci~='release'][data-ci~='stable']::before {
+  background: #16a34a;
+}
+
+.legend span[data-ci~='release'][data-ci~='prerelease']::before {
+  background: #a855f7;
+}
+
+.legend span[data-ci~='release'][data-ci~='draft']::before {
+  background: #d4d4d4;
+}
+
+.legend span[data-ci~='release'][data-ci~='old']::before {
+  opacity: 0.45;
+}
+
+.legend span[data-ci~='tag'][data-ci~='version']::before {
+  background: #0f766e;
+}
+
+.legend span[data-ci~='tag'][data-ci~='other']::before {
+  background: #d4d4d4;
+}
+
 .square {
   width: 56px;
   height: 56px;
@@ -192,6 +231,30 @@ h2 {
 .square[data-ci~='busy'] {
   outline: 3px solid #ef4444;
   outline-offset: -7px;
+}
+
+.square[data-ci~='release'][data-ci~='stable'] {
+  background: #16a34a;
+}
+
+.square[data-ci~='release'][data-ci~='prerelease'] {
+  background: #a855f7;
+}
+
+.square[data-ci~='release'][data-ci~='draft'] {
+  background: #d4d4d4;
+}
+
+.square[data-ci~='release'][data-ci~='old'] {
+  opacity: 0.45;
+}
+
+.square[data-ci~='tag'][data-ci~='version'] {
+  background: #0f766e;
+}
+
+.square[data-ci~='tag'][data-ci~='other'] {
+  background: #d4d4d4;
 }
 
 .square:hover,
