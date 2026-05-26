@@ -94,6 +94,13 @@ body {
   line-height: 1.4;
 }
 
+.tokenLink {
+  width: fit-content;
+  color: black;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .tokenInput {
   border: 2px solid black;
   background: white;
