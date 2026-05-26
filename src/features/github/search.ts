@@ -1,5 +1,14 @@
 import { isBotMember, teamPermission } from './status';
-import type { IssueOrPull, Member, Release, Repo, RepoWithCi, Tag, Team, WorkflowRun } from './types';
+import type {
+  IssueOrPull,
+  Member,
+  Release,
+  Repo,
+  RepoWithCi,
+  Tag,
+  Team,
+  WorkflowRun,
+} from './types';
 
 export function filterItems<T>(items: T[], query: string, getText: (item: T) => string) {
   const terms = normalize(query).split(/\s+/).filter(Boolean);

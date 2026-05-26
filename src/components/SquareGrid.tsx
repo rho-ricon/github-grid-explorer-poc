@@ -1,7 +1,7 @@
-import { useMemo, type DragEvent, type ReactNode } from 'react';
 import { Avatar } from '@base-ui/react/avatar';
 import { ContextMenu } from '@base-ui/react/context-menu';
 import { Popover } from '@base-ui/react/popover';
+import { type DragEvent, type ReactNode, useMemo } from 'react';
 
 export function SquareGrid<T>({
   items,

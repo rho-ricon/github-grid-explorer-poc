@@ -57,8 +57,9 @@ export function isBotMember(member: Pick<Member, 'login' | 'type'>) {
 }
 
 export function teamPermission(team: Team) {
-  return ['pull', 'triage', 'push', 'maintain', 'admin'].includes(team.permission || '')
-    ? team.permission!
+  const permission = team.permission;
+  return permission && ['pull', 'triage', 'push', 'maintain', 'admin'].includes(permission)
+    ? permission
     : 'unknown';
 }
 

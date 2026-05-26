@@ -1,9 +1,4 @@
-import {
-  readCache,
-  removeCacheByPrefix,
-  writeCache,
-  type CacheStore,
-} from '../../utils/cache';
+import { type CacheStore, readCache, removeCacheByPrefix, writeCache } from '../../utils/cache';
 
 export const ORG = 'KnickKnackLabs';
 export const CACHE_TTL = 10 * 60 * 1000;
@@ -19,7 +14,10 @@ export function githubPath(path: string) {
 }
 
 export function readCachedJson<T>(url: string, auth: GitHubAuth): T | null {
-  const cached = readCache<T>(githubCacheKey(url, isAuthenticatedRequest(url, auth)), cacheStore(url, auth));
+  const cached = readCache<T>(
+    githubCacheKey(url, isAuthenticatedRequest(url, auth)),
+    cacheStore(url, auth),
+  );
   return cached && cached.expiresAt > Date.now() ? cached.data : null;
 }
 
@@ -79,7 +77,9 @@ function isAuthenticatedRequest(url: string, auth: GitHubAuth) {
 
 function cacheStore(url: string, auth: GitHubAuth): CacheStore {
   if (!isAuthenticatedRequest(url, auth)) return 'local';
-  return auth.rememberToken || (import.meta.env.DEV && url.startsWith('/github/')) ? 'local' : 'session';
+  return auth.rememberToken || (import.meta.env.DEV && url.startsWith('/github/'))
+    ? 'local'
+    : 'session';
 }
 
 function githubCacheKey(url: string, authenticated: boolean) {

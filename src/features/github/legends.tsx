@@ -1,6 +1,6 @@
 export function CiLegend() {
   return (
-    <div className="legend" aria-label="CI status legend">
+    <div className="legend">
       <span data-ci="success">success</span>
       <span data-ci="failure">failure</span>
       <span data-ci="running">running</span>
@@ -11,7 +11,7 @@ export function CiLegend() {
 
 export function WorkflowRunLegend() {
   return (
-    <div className="legend" aria-label="workflow run legend">
+    <div className="legend">
       <span data-ci="success">success</span>
       <span data-ci="failure">failure</span>
       <span data-ci="running">running</span>
@@ -22,7 +22,7 @@ export function WorkflowRunLegend() {
 
 export function TeamLegend() {
   return (
-    <div className="legend" aria-label="team legend">
+    <div className="legend">
       <span data-ci="team admin">admin</span>
       <span data-ci="team maintain">maintain</span>
       <span data-ci="team push">push</span>
@@ -38,7 +38,7 @@ export function TeamLegend() {
 
 export function MemberLegend() {
   return (
-    <div className="legend" aria-label="member legend">
+    <div className="legend">
       <span data-ci="member user">user</span>
       <span data-ci="member bot">bot</span>
       <span data-ci="member site-admin">site admin</span>
@@ -48,7 +48,7 @@ export function MemberLegend() {
 
 export function IssueLegend({ kind }: { kind: 'issue' | 'pr' }) {
   return (
-    <div className="legend" aria-label={`${kind} legend`}>
+    <div className="legend">
       <span data-ci={`${kind} open`}>open</span>
       <span data-ci={`${kind} closed`}>closed</span>
       <span data-ci="stale">stale</span>
@@ -59,7 +59,7 @@ export function IssueLegend({ kind }: { kind: 'issue' | 'pr' }) {
 
 export function ReleaseLegend() {
   return (
-    <div className="legend" aria-label="release legend">
+    <div className="legend">
       <span data-ci="release stable">stable</span>
       <span data-ci="release prerelease">pre</span>
       <span data-ci="release draft">draft</span>
@@ -70,7 +70,7 @@ export function ReleaseLegend() {
 
 export function TagLegend() {
   return (
-    <div className="legend" aria-label="tag legend">
+    <div className="legend">
       <span data-ci="tag version">version</span>
       <span data-ci="tag other">other</span>
     </div>

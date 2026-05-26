@@ -1,5 +1,5 @@
-import { useState, type DragEvent } from 'react';
 import { Avatar } from '@base-ui/react/avatar';
+import { type DragEvent, useState } from 'react';
 
 export type PouchItem = {
   key: string;
@@ -65,7 +65,12 @@ export function Pouch<T extends PouchItem>({
           ) : (
             <div className="pouchItems">
               {items.map((item) => (
-                <div className="pouchItem" key={item.key} data-kind={item.kind} data-ci={item.status}>
+                <div
+                  className="pouchItem"
+                  key={item.key}
+                  data-kind={item.kind}
+                  data-ci={item.status}
+                >
                   <button
                     className="pouchItemDrag"
                     type="button"
@@ -80,7 +85,12 @@ export function Pouch<T extends PouchItem>({
                   >
                     {item.image ? (
                       <Avatar.Root className="pouchAvatar">
-                        <Avatar.Image className="avatarImage" src={item.image} alt="" draggable={false} />
+                        <Avatar.Image
+                          className="avatarImage"
+                          src={item.image}
+                          alt=""
+                          draggable={false}
+                        />
                         <Avatar.Fallback className="avatarFallback" delay={200}>
                           {fallbackText(item.label)}
                         </Avatar.Fallback>

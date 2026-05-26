@@ -96,7 +96,9 @@ export function ReleasePreview({ release }: { release: Release }) {
         <span>{release.target_commitish}</span>
         <span>{release.author?.login || 'unknown'}</span>
         <span>{release.assets.length} assets</span>
-        <span>Published {release.published_at ? formatDate(release.published_at) : 'unpublished'}</span>
+        <span>
+          Published {release.published_at ? formatDate(release.published_at) : 'unpublished'}
+        </span>
         {isOldRelease(release) && <span>old</span>}
       </div>
     </div>

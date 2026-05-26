@@ -72,6 +72,22 @@ On GitHub Pages, the app calls `https://api.github.com` directly. If a user prov
 
 No token is committed, built into the app, or available to GitHub Pages.
 
+## Quality checks
+
+```bash
+bun run lint
+bun run test
+bun run build
+```
+
+Run all three with:
+
+```bash
+bun run check
+```
+
+Use `bun run format` to apply Biome formatting/import organization.
+
 ## Build
 
 ```bash

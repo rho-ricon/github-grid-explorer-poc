@@ -1,11 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  CACHE_TTL,
-  CI_CACHE_TTL,
-  fetchCachedJson,
-  githubPath,
-  readCachedJson,
-} from './api';
+import { CACHE_TTL, CI_CACHE_TTL, fetchCachedJson, githubPath, readCachedJson } from './api';
 import { useGitHubAuth } from './auth';
 import type { Repo, RepoCi, WorkflowRun } from './types';
 
@@ -56,7 +50,10 @@ export function useGitHubList<T>(url: string, errorMessage: string) {
 
 export function useRepoCiStatuses(repos: Repo[]) {
   const auth = useGitHubAuth();
-  const authKey = useMemo(() => (auth.token || import.meta.env.DEV ? 'auth' : 'public'), [auth.token]);
+  const authKey = useMemo(
+    () => (auth.token || import.meta.env.DEV ? 'auth' : 'public'),
+    [auth.token],
+  );
   const [statuses, setStatuses] = useState<Record<number, RepoCi>>({});
 
   useEffect(() => {
@@ -69,7 +66,10 @@ export function useRepoCiStatuses(repos: Repo[]) {
 
     setStatuses(
       Object.fromEntries(
-        repos.map((repo) => [repo.id, ciCache.get(ciKey(repo, authKey)) || readRepoCiCache(repo, auth) || loadingCi]),
+        repos.map((repo) => [
+          repo.id,
+          ciCache.get(ciKey(repo, authKey)) || readRepoCiCache(repo, auth) || loadingCi,
+        ]),
       ),
     );
 

@@ -2,8 +2,8 @@ import { Drawer } from '@base-ui/react/drawer';
 import { Screen } from '../../components/Screen';
 import { openInGitHub } from './api';
 import { formatDate } from './status';
-import type { RepoWithCi } from './types';
 import { TokenSettings } from './TokenSettings';
+import type { RepoWithCi } from './types';
 
 export function RepoCompareScreen({ left, right }: { left: RepoWithCi; right: RepoWithCi }) {
   return (
@@ -79,19 +79,22 @@ function CompareSignals({ left, right }: { left: RepoWithCi; right: RepoWithCi }
           Language:{' '}
           {left.language === right.language
             ? `both ${left.language || 'unspecified'}`
-            : `${left.language || 'unspecified'} vs ${right.language || 'unspecified'}`}.
+            : `${left.language || 'unspecified'} vs ${right.language || 'unspecified'}`}
+          .
         </li>
         <li>
           Open issues:{' '}
           {issueDelta === 0
             ? 'same count'
-            : `${Math.abs(issueDelta)} more in ${issueDelta > 0 ? left.name : right.name}`}.
+            : `${Math.abs(issueDelta)} more in ${issueDelta > 0 ? left.name : right.name}`}
+          .
         </li>
         <li>
           Stars:{' '}
           {starDelta === 0
             ? 'same count'
-            : `${Math.abs(starDelta)} more for ${starDelta > 0 ? left.name : right.name}`}.
+            : `${Math.abs(starDelta)} more for ${starDelta > 0 ? left.name : right.name}`}
+          .
         </li>
         <li>{newer ? `${newer.name} was updated more recently.` : 'Updated at the same time.'}</li>
       </ul>

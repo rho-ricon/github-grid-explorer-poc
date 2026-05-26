@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, type ReactNode, useContext, useMemo, useState } from 'react';
 import { clearAuthenticatedGitHubCache } from './api';
 
 const TOKEN_STORAGE_KEY = 'github-grid-explorer:token';

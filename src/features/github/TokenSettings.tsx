@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { Popover } from '@base-ui/react/popover';
+import { useEffect, useState } from 'react';
 import { ORG } from './api';
 import { useGitHubAuth } from './auth';
 
@@ -27,12 +27,7 @@ export function TokenSettings() {
               localStorage on this device.
             </Popover.Description>
 
-            <a
-              className="tokenLink"
-              href={fineGrainedTokenUrl()}
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a className="tokenLink" href={fineGrainedTokenUrl()} target="_blank" rel="noreferrer">
               Create {TOKEN_EXPIRATION_DAYS}-day read-only token
             </a>
 
@@ -55,7 +50,10 @@ export function TokenSettings() {
             </label>
 
             <div className="tokenActions">
-              <Popover.Close className="actionButton" onClick={() => saveToken(draftToken, remember)}>
+              <Popover.Close
+                className="actionButton"
+                onClick={() => saveToken(draftToken, remember)}
+              >
                 Save
               </Popover.Close>
               <Popover.Close className="actionButton" onClick={clearToken}>

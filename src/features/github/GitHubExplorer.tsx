@@ -1,23 +1,23 @@
-import { useMemo, useState, type DragEvent, type ReactNode } from 'react';
 import { Drawer } from '@base-ui/react/drawer';
 import { Menu } from '@base-ui/react/menu';
+import { type DragEvent, type ReactNode, useMemo, useState } from 'react';
 import { GridSection } from '../../components/GridSection';
 import { Screen } from '../../components/Screen';
 import { SquareGrid } from '../../components/SquareGrid';
-import { githubPath, openInGitHub, ORG } from './api';
+import { githubPath, ORG, openInGitHub } from './api';
 import { githubAvatarUrl } from './avatars';
 import { MemberContextMenu, RepoContextMenu, TeamContextMenu } from './contextMenus';
 import { useGitHubList, useRepoCiStatuses } from './hooks';
 import { CiLegend, MemberLegend, TeamLegend } from './legends';
 import { Pouch, type PouchItem } from './Pouch';
 import { MemberPreview, RepoPreview, TeamPreview } from './previews';
-import { filterItems, memberSearchText, repoSearchText, teamSearchText } from './search';
-import { memberSquareStatus, teamSquareStatus } from './status';
-import type { IssueOrPull, Member, Repo, RepoWithCi, Team } from './types';
 import { RepoCompareScreen } from './RepoCompareScreen';
 import { RepoScreen } from './RepoScreen';
+import { filterItems, memberSearchText, repoSearchText, teamSearchText } from './search';
+import { memberSquareStatus, teamSquareStatus } from './status';
 import { TeamScreen } from './TeamScreen';
 import { TokenSettings } from './TokenSettings';
+import type { IssueOrPull, Member, Repo, RepoWithCi, Team } from './types';
 
 type CarriedItem =
   | (PouchItem & { kind: 'member'; member: Member })
@@ -233,7 +233,9 @@ export function GitHubExplorer() {
         onDragItem={(item) => setDragged(item)}
         onDragEnd={() => setDragged(null)}
         onRemove={(item) =>
-          setPouchedItems((current) => current.filter((currentItem) => currentItem.key !== item.key))
+          setPouchedItems((current) =>
+            current.filter((currentItem) => currentItem.key !== item.key),
+          )
         }
         onClear={() => setPouchedItems([])}
       />
@@ -369,7 +371,9 @@ function RelationshipDropMenu({
                 <div className="dropMenuLabel">
                   {drop.source.name} ↔ {drop.target.name}
                 </div>
-                <DropMenuItem onClick={() => onCompareRepos(drop)}>Compare repo summary</DropMenuItem>
+                <DropMenuItem onClick={() => onCompareRepos(drop)}>
+                  Compare repo summary
+                </DropMenuItem>
                 <Menu.Separator className="contextMenuSeparator" />
                 <DropMenuItem
                   onClick={() => {

@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState, type DragEvent } from 'react';
 import { Drawer } from '@base-ui/react/drawer';
+import { type DragEvent, useEffect, useMemo, useState } from 'react';
 import { GridSection } from '../../components/GridSection';
 import { Screen } from '../../components/Screen';
 import { SquareGrid } from '../../components/SquareGrid';
@@ -11,6 +11,7 @@ import {
   WorkflowRunContextMenu,
 } from './contextMenus';
 import { useGitHubData, useGitHubList } from './hooks';
+import { ItemScreen } from './ItemScreen';
 import { IssueLegend, ReleaseLegend, TagLegend, WorkflowRunLegend } from './legends';
 import { IssuePreview, ReleasePreview, TagPreview, WorkflowRunPreview } from './previews';
 import {
@@ -27,9 +28,8 @@ import {
   tagUrl,
   workflowRunSquareStatus,
 } from './status';
-import type { IssueOrPull, Member, Release, Repo, Tag, WorkflowRunsResponse } from './types';
-import { ItemScreen } from './ItemScreen';
 import { TokenSettings } from './TokenSettings';
+import type { IssueOrPull, Member, Release, Repo, Tag, WorkflowRunsResponse } from './types';
 
 export function RepoScreen({
   repo,
@@ -71,19 +71,33 @@ export function RepoScreen({
     [workflowRunData.data, query],
   );
   const issues = useMemo(
-    () => filterItems(issueData.items.filter((item) => !item.pull_request), query, issueSearchText),
+    () =>
+      filterItems(
+        issueData.items.filter((item) => !item.pull_request),
+        query,
+        issueSearchText,
+      ),
     [issueData.items, query],
   );
   const pullRequests = useMemo(
-    () => filterItems(issueData.items.filter((item) => item.pull_request), query, issueSearchText),
+    () =>
+      filterItems(
+        issueData.items.filter((item) => item.pull_request),
+        query,
+        issueSearchText,
+      ),
     [issueData.items, query],
   );
   const releases = useMemo(
     () => filterItems(releaseData.items, query, releaseSearchText),
     [releaseData.items, query],
   );
-  const tags = useMemo(() => filterItems(tagData.items, query, tagSearchText), [tagData.items, query]);
-  const loading = workflowRunData.loading || issueData.loading || releaseData.loading || tagData.loading;
+  const tags = useMemo(
+    () => filterItems(tagData.items, query, tagSearchText),
+    [tagData.items, query],
+  );
+  const loading =
+    workflowRunData.loading || issueData.loading || releaseData.loading || tagData.loading;
 
   return (
     <Drawer.Content className="screen">
@@ -101,7 +115,10 @@ export function RepoScreen({
       >
         <Drawer.Root open={item !== null} onOpenChange={(open) => !open && setItem(null)}>
           <div className="sections">
-            <GridSection title="Workflow Runs" empty={workflowRunData.error || 'No matching workflow runs.'}>
+            <GridSection
+              title="Workflow Runs"
+              empty={workflowRunData.error || 'No matching workflow runs.'}
+            >
               {workflowRunData.loading ? (
                 <p>Loading…</p>
               ) : (
@@ -111,7 +128,9 @@ export function RepoScreen({
                     <SquareGrid
                       items={workflowRuns}
                       label="Workflow run"
-                      getLabel={(run) => `${run.name}: ${run.display_title || `#${run.run_number}`}`}
+                      getLabel={(run) =>
+                        `${run.name}: ${run.display_title || `#${run.run_number}`}`
+                      }
                       getStatus={workflowRunSquareStatus}
                       onPick={(run) => openInGitHub(run.html_url)}
                       renderPreview={(run) => <WorkflowRunPreview run={run} />}
@@ -163,7 +182,8 @@ export function RepoScreen({
                       onPick={setItem}
                       onDrop={
                         draggedMember
-                          ? (pullRequest, event) => onMemberIssueDrop?.(draggedMember, pullRequest, event)
+                          ? (pullRequest, event) =>
+                              onMemberIssueDrop?.(draggedMember, pullRequest, event)
                           : undefined
                       }
                       renderPreview={(i) => <IssuePreview item={i} />}

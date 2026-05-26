@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
+import { defineConfig, type Plugin } from 'vite';
 
 function githubProxy(): Plugin {
   let token: string | null | undefined;

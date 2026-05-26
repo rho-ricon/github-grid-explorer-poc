@@ -1,15 +1,17 @@
-import type { ReactNode } from 'react';
 import { ContextMenu } from '@base-ui/react/context-menu';
+import type { ReactNode } from 'react';
 import { copyText } from '../../utils/clipboard';
 import { openInGitHub } from './api';
 import { tagUrl } from './status';
 import type { IssueOrPull, Member, Release, Repo, RepoCi, Tag, Team, WorkflowRun } from './types';
 
 export function RepoContextMenu({ repo }: { repo: Repo & { ci?: RepoCi } }) {
+  const ciUrl = repo.ci?.url;
+
   return (
     <>
       <ContextItem onClick={() => openInGitHub(repo.html_url)}>Open on GitHub</ContextItem>
-      {repo.ci?.url && <ContextItem onClick={() => openInGitHub(repo.ci!.url!)}>Open latest CI run</ContextItem>}
+      {ciUrl && <ContextItem onClick={() => openInGitHub(ciUrl)}>Open latest CI run</ContextItem>}
       <ContextMenu.Separator className="contextMenuSeparator" />
       <CopySubmenu>
         <ContextItem onClick={() => copyText(repo.name)}>Repo name</ContextItem>
@@ -22,6 +24,7 @@ export function RepoContextMenu({ repo }: { repo: Repo & { ci?: RepoCi } }) {
 
 export function WorkflowRunContextMenu({ run }: { run: WorkflowRun }) {
   const title = run.display_title || run.name;
+  const branch = run.head_branch;
 
   return (
     <>
@@ -31,7 +34,7 @@ export function WorkflowRunContextMenu({ run }: { run: WorkflowRun }) {
         <ContextItem onClick={() => copyText(title)}>Title</ContextItem>
         <ContextItem onClick={() => copyText(run.name)}>Workflow name</ContextItem>
         <ContextItem onClick={() => copyText(run.html_url)}>URL</ContextItem>
-        {run.head_branch && <ContextItem onClick={() => copyText(run.head_branch!)}>Branch</ContextItem>}
+        {branch && <ContextItem onClick={() => copyText(branch)}>Branch</ContextItem>}
         <ContextItem onClick={() => copyText(run.head_sha)}>Commit SHA</ContextItem>
       </CopySubmenu>
     </>
@@ -66,6 +69,8 @@ export function MemberContextMenu({ member }: { member: Member }) {
 }
 
 export function IssueContextMenu({ item }: { item: IssueOrPull }) {
+  const author = item.user?.login;
+
   return (
     <>
       <ContextItem onClick={() => openInGitHub(item.html_url)}>Open on GitHub</ContextItem>
@@ -74,7 +79,7 @@ export function IssueContextMenu({ item }: { item: IssueOrPull }) {
         <ContextItem onClick={() => copyText(`#${item.number}`)}>#{item.number}</ContextItem>
         <ContextItem onClick={() => copyText(item.title)}>Title</ContextItem>
         <ContextItem onClick={() => copyText(item.html_url)}>URL</ContextItem>
-        {item.user?.login && <ContextItem onClick={() => copyText(item.user!.login)}>Author</ContextItem>}
+        {author && <ContextItem onClick={() => copyText(author)}>Author</ContextItem>}
       </CopySubmenu>
     </>
   );
