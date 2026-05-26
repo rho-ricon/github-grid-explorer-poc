@@ -7,7 +7,7 @@ import {
 
 export const ORG = 'KnickKnackLabs';
 export const CACHE_TTL = 10 * 60 * 1000;
-export const CI_CACHE_TTL = 2 * 60 * 1000;
+export const CI_CACHE_TTL = CACHE_TTL;
 
 type GitHubAuth = {
   token: string;
@@ -38,9 +38,16 @@ export async function fetchCachedJson<T>(
     return cached.data;
   }
 
-  const response = await fetch(requestUrl(url, auth), {
-    headers: requestHeaders(auth),
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(requestUrl(url, auth), {
+      headers: requestHeaders(auth),
+    });
+  } catch (error) {
+    if (cached) return cached.data;
+    throw error;
+  }
 
   if (!response.ok) {
     if (cached) return cached.data;

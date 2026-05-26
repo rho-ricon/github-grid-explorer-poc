@@ -4,10 +4,13 @@ import { GridSection } from '../../components/GridSection';
 import { Screen } from '../../components/Screen';
 import { SquareGrid } from '../../components/SquareGrid';
 import { githubPath, openInGitHub, ORG } from './api';
+import { githubAvatarUrl } from './avatars';
 import { MemberContextMenu } from './contextMenus';
 import { useGitHubList } from './hooks';
+import { MemberLegend } from './legends';
 import { MemberPreview } from './previews';
 import { filterItems, memberSearchText } from './search';
+import { memberSquareStatus } from './status';
 import type { Member, Team } from './types';
 import { TokenSettings } from './TokenSettings';
 
@@ -38,14 +41,19 @@ export function TeamScreen({ team }: { team: Team }) {
               <p>Loading…</p>
             ) : (
               filteredMembers.length > 0 && (
-                <SquareGrid
-                  items={filteredMembers}
-                  label="Team member"
-                  getLabel={(member) => member.login}
-                  onPick={(member) => openInGitHub(member.html_url)}
-                  renderPreview={(member) => <MemberPreview member={member} />}
-                  renderContextMenu={(member) => <MemberContextMenu member={member} />}
-                />
+                <>
+                  <MemberLegend />
+                  <SquareGrid
+                    items={filteredMembers}
+                    label="Team member"
+                    getLabel={(member) => member.login}
+                    getStatus={memberSquareStatus}
+                    getImage={(member) => githubAvatarUrl(member.avatar_url, 56)}
+                    onPick={(member) => openInGitHub(member.html_url)}
+                    renderPreview={(member) => <MemberPreview member={member} />}
+                    renderContextMenu={(member) => <MemberContextMenu member={member} />}
+                  />
+                </>
               )
             )}
           </GridSection>

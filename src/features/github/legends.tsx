@@ -9,6 +9,43 @@ export function CiLegend() {
   );
 }
 
+export function WorkflowRunLegend() {
+  return (
+    <div className="legend" aria-label="workflow run legend">
+      <span data-ci="success">success</span>
+      <span data-ci="failure">failure</span>
+      <span data-ci="running">running</span>
+      <span data-ci="neutral">neutral</span>
+    </div>
+  );
+}
+
+export function TeamLegend() {
+  return (
+    <div className="legend" aria-label="team legend">
+      <span data-ci="team admin">admin</span>
+      <span data-ci="team maintain">maintain</span>
+      <span data-ci="team push">push</span>
+      <span data-ci="team triage">triage</span>
+      <span data-ci="team pull">pull</span>
+      <span data-ci="team secret">secret</span>
+      <span data-ci="team child">nested</span>
+      <span data-ci="team large">large</span>
+      <span data-ci="team empty">empty</span>
+    </div>
+  );
+}
+
+export function MemberLegend() {
+  return (
+    <div className="legend" aria-label="member legend">
+      <span data-ci="member user">user</span>
+      <span data-ci="member bot">bot</span>
+      <span data-ci="member site-admin">site admin</span>
+    </div>
+  );
+}
+
 export function IssueLegend({ kind }: { kind: 'issue' | 'pr' }) {
   return (
     <div className="legend" aria-label={`${kind} legend`}>

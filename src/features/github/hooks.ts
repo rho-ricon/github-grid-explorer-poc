@@ -13,10 +13,10 @@ const loadingCi: RepoCi = { state: 'loading', label: 'Loading CI…' };
 const ciCache = new Map<string, RepoCi>();
 const ciPending = new Map<string, Promise<RepoCi>>();
 
-export function useGitHubList<T>(url: string, errorMessage: string) {
+export function useGitHubData<T>(url: string, errorMessage: string, ttl = CACHE_TTL) {
   const auth = useGitHubAuth();
-  const initialCache = readCachedJson<T[]>(url, auth);
-  const [items, setItems] = useState<T[]>(() => initialCache || []);
+  const initialCache = readCachedJson<T>(url, auth);
+  const [data, setData] = useState<T | null>(() => initialCache);
   const [loading, setLoading] = useState(() => !initialCache);
   const [error, setError] = useState('');
 
@@ -28,11 +28,11 @@ export function useGitHubList<T>(url: string, errorMessage: string) {
         setLoading(true);
         setError('');
 
-        const cached = readCachedJson<T[]>(url, auth);
-        if (cached && active) setItems(cached);
+        const cached = readCachedJson<T>(url, auth);
+        if (active) setData(cached);
 
-        const data = await fetchCachedJson<T[]>(url, errorMessage, CACHE_TTL, auth);
-        if (active) setItems(data);
+        const nextData = await fetchCachedJson<T>(url, errorMessage, ttl, auth);
+        if (active) setData(nextData);
       } catch (error) {
         if (active) setError(error instanceof Error ? error.message : errorMessage);
       } finally {
@@ -44,9 +44,14 @@ export function useGitHubList<T>(url: string, errorMessage: string) {
     return () => {
       active = false;
     };
-  }, [url, errorMessage, auth.token, auth.rememberToken]);
+  }, [url, errorMessage, ttl, auth.token, auth.rememberToken]);
 
-  return { items, loading, error };
+  return { data, loading, error };
+}
+
+export function useGitHubList<T>(url: string, errorMessage: string) {
+  const { data, loading, error } = useGitHubData<T[]>(url, errorMessage);
+  return { items: data || [], loading, error };
 }
 
 export function useRepoCiStatuses(repos: Repo[]) {

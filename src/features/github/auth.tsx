@@ -22,6 +22,8 @@ export function GitHubAuthProvider({ children }: { children: ReactNode }) {
       rememberToken,
       saveToken(nextToken, remember) {
         const trimmed = nextToken.trim();
+        const authScopeChanged = trimmed !== token || remember !== rememberToken;
+
         setToken(trimmed);
         setRememberToken(remember);
 
@@ -29,6 +31,10 @@ export function GitHubAuthProvider({ children }: { children: ReactNode }) {
           localStorage.setItem(TOKEN_STORAGE_KEY, trimmed);
         } else {
           localStorage.removeItem(TOKEN_STORAGE_KEY);
+        }
+
+        if (authScopeChanged) {
+          clearAuthenticatedGitHubCache();
         }
       },
       clearToken() {

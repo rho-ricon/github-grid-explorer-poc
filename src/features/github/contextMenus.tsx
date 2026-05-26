@@ -3,7 +3,7 @@ import { ContextMenu } from '@base-ui/react/context-menu';
 import { copyText } from '../../utils/clipboard';
 import { openInGitHub } from './api';
 import { tagUrl } from './status';
-import type { IssueOrPull, Member, Release, Repo, RepoCi, Tag, Team } from './types';
+import type { IssueOrPull, Member, Release, Repo, RepoCi, Tag, Team, WorkflowRun } from './types';
 
 export function RepoContextMenu({ repo }: { repo: Repo & { ci?: RepoCi } }) {
   return (
@@ -15,6 +15,24 @@ export function RepoContextMenu({ repo }: { repo: Repo & { ci?: RepoCi } }) {
         <ContextItem onClick={() => copyText(repo.name)}>Repo name</ContextItem>
         <ContextItem onClick={() => copyText(repo.full_name)}>Full name</ContextItem>
         <ContextItem onClick={() => copyText(repo.html_url)}>URL</ContextItem>
+      </CopySubmenu>
+    </>
+  );
+}
+
+export function WorkflowRunContextMenu({ run }: { run: WorkflowRun }) {
+  const title = run.display_title || run.name;
+
+  return (
+    <>
+      <ContextItem onClick={() => openInGitHub(run.html_url)}>Open on GitHub</ContextItem>
+      <ContextMenu.Separator className="contextMenuSeparator" />
+      <CopySubmenu>
+        <ContextItem onClick={() => copyText(title)}>Title</ContextItem>
+        <ContextItem onClick={() => copyText(run.name)}>Workflow name</ContextItem>
+        <ContextItem onClick={() => copyText(run.html_url)}>URL</ContextItem>
+        {run.head_branch && <ContextItem onClick={() => copyText(run.head_branch!)}>Branch</ContextItem>}
+        <ContextItem onClick={() => copyText(run.head_sha)}>Commit SHA</ContextItem>
       </CopySubmenu>
     </>
   );

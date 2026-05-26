@@ -4,22 +4,38 @@ import { GridSection } from '../../components/GridSection';
 import { Screen } from '../../components/Screen';
 import { SquareGrid } from '../../components/SquareGrid';
 import { githubPath, openInGitHub } from './api';
-import { IssueContextMenu, ReleaseContextMenu, TagContextMenu } from './contextMenus';
-import { useGitHubList } from './hooks';
-import { IssueLegend, ReleaseLegend, TagLegend } from './legends';
-import { IssuePreview, ReleasePreview, TagPreview } from './previews';
+import {
+  IssueContextMenu,
+  ReleaseContextMenu,
+  TagContextMenu,
+  WorkflowRunContextMenu,
+} from './contextMenus';
+import { useGitHubData, useGitHubList } from './hooks';
+import { IssueLegend, ReleaseLegend, TagLegend, WorkflowRunLegend } from './legends';
+import { IssuePreview, ReleasePreview, TagPreview, WorkflowRunPreview } from './previews';
 import {
   filterItems,
   issueSearchText,
   releaseSearchText,
   tagSearchText,
+  workflowRunSearchText,
 } from './search';
-import { issueSquareStatus, releaseSquareStatus, tagSquareStatus, tagUrl } from './status';
-import type { IssueOrPull, Release, Repo, Tag } from './types';
+import {
+  issueSquareStatus,
+  releaseSquareStatus,
+  tagSquareStatus,
+  tagUrl,
+  workflowRunSquareStatus,
+} from './status';
+import type { IssueOrPull, Release, Repo, Tag, WorkflowRunsResponse } from './types';
 import { ItemScreen } from './ItemScreen';
 import { TokenSettings } from './TokenSettings';
 
 export function RepoScreen({ repo }: { repo: Repo }) {
+  const workflowRunData = useGitHubData<WorkflowRunsResponse>(
+    githubPath(`/repos/${repo.full_name}/actions/runs?per_page=100`),
+    'Could not load workflow runs.',
+  );
   const issueData = useGitHubList<IssueOrPull>(
     githubPath(`/repos/${repo.full_name}/issues?state=all&per_page=100`),
     'Could not load issues/PRs.',
@@ -40,6 +56,10 @@ export function RepoScreen({ repo }: { repo: Repo }) {
     setQuery('');
   }, [repo.id]);
 
+  const workflowRuns = useMemo(
+    () => filterItems(workflowRunData.data?.workflow_runs || [], query, workflowRunSearchText),
+    [workflowRunData.data, query],
+  );
   const issues = useMemo(
     () => filterItems(issueData.items.filter((item) => !item.pull_request), query, issueSearchText),
     [issueData.items, query],
@@ -53,7 +73,7 @@ export function RepoScreen({ repo }: { repo: Repo }) {
     [releaseData.items, query],
   );
   const tags = useMemo(() => filterItems(tagData.items, query, tagSearchText), [tagData.items, query]);
-  const loading = issueData.loading || releaseData.loading || tagData.loading;
+  const loading = workflowRunData.loading || issueData.loading || releaseData.loading || tagData.loading;
 
   return (
     <Drawer.Content className="screen">
@@ -66,11 +86,32 @@ export function RepoScreen({ repo }: { repo: Repo }) {
         count={
           loading
             ? 'Loading…'
-            : `${issues.length} issues / ${pullRequests.length} PRs / ${releases.length} releases / ${tags.length} tags`
+            : `${workflowRuns.length} runs / ${issues.length} issues / ${pullRequests.length} PRs / ${releases.length} releases / ${tags.length} tags`
         }
       >
         <Drawer.Root open={item !== null} onOpenChange={(open) => !open && setItem(null)}>
           <div className="sections">
+            <GridSection title="Workflow Runs" empty={workflowRunData.error || 'No matching workflow runs.'}>
+              {workflowRunData.loading ? (
+                <p>Loading…</p>
+              ) : (
+                workflowRuns.length > 0 && (
+                  <>
+                    <WorkflowRunLegend />
+                    <SquareGrid
+                      items={workflowRuns}
+                      label="Workflow run"
+                      getLabel={(run) => `${run.name}: ${run.display_title || `#${run.run_number}`}`}
+                      getStatus={workflowRunSquareStatus}
+                      onPick={(run) => openInGitHub(run.html_url)}
+                      renderPreview={(run) => <WorkflowRunPreview run={run} />}
+                      renderContextMenu={(run) => <WorkflowRunContextMenu run={run} />}
+                    />
+                  </>
+                )
+              )}
+            </GridSection>
+
             <GridSection title="Issues" empty={issueData.error || 'No matching issues.'}>
               {issueData.loading ? (
                 <p>Loading…</p>

@@ -28,11 +28,12 @@ Open http://localhost:5173/.
 ### Org view
 
 - **Repos** — latest GitHub Actions state colors each repo square.
-- **Teams** — click to view team members. Requires a token with org/member read access.
-- **Members** — public org members, or token-visible members.
+- **Teams** — permission-colored squares, with secret/large/empty/nested markers. Click to view team members. Requires a token with org/member read access.
+- **Members** — avatar squares with bot/site-admin markers for public org members, or token-visible members.
 
 ### Repo view
 
+- **Workflow Runs** — latest GitHub Actions runs by status/conclusion.
 - **Issues** — open/closed, stale, and busy states.
 - **Pull Requests** — open/closed, stale, and busy states.
 - **Releases** — GitHub Releases, including stable/prerelease/draft/old states.
@@ -89,6 +90,5 @@ GITHUB_PAGES=true bun run build
 
 ## Possible next experiments
 
-- Add a Workflow Runs grid to repo view.
 - Use Base UI `Meter` for CI success rate, milestone progress, or activity/freshness.
 - Prototype non-mutating drag/drop gestures, such as comparing squares or filtering repo work by member.

@@ -4,11 +4,13 @@ import { GridSection } from '../../components/GridSection';
 import { Screen } from '../../components/Screen';
 import { SquareGrid } from '../../components/SquareGrid';
 import { githubPath, openInGitHub, ORG } from './api';
+import { githubAvatarUrl } from './avatars';
 import { MemberContextMenu, RepoContextMenu, TeamContextMenu } from './contextMenus';
 import { useGitHubList, useRepoCiStatuses } from './hooks';
-import { CiLegend } from './legends';
+import { CiLegend, MemberLegend, TeamLegend } from './legends';
 import { MemberPreview, RepoPreview, TeamPreview } from './previews';
 import { filterItems, memberSearchText, repoSearchText, teamSearchText } from './search';
+import { memberSquareStatus, teamSquareStatus } from './status';
 import type { Member, Repo, RepoWithCi, Team } from './types';
 import { RepoScreen } from './RepoScreen';
 import { TeamScreen } from './TeamScreen';
@@ -91,14 +93,18 @@ export function GitHubExplorer() {
               <p>Loading…</p>
             ) : (
               filteredTeams.length > 0 && (
-                <SquareGrid
-                  items={filteredTeams}
-                  label="Team"
-                  getLabel={(team) => team.name}
-                  onPick={(team) => setSelection({ type: 'team', team })}
-                  renderPreview={(team) => <TeamPreview team={team} />}
-                  renderContextMenu={(team) => <TeamContextMenu team={team} />}
-                />
+                <>
+                  <TeamLegend />
+                  <SquareGrid
+                    items={filteredTeams}
+                    label="Team"
+                    getLabel={(team) => team.name}
+                    getStatus={teamSquareStatus}
+                    onPick={(team) => setSelection({ type: 'team', team })}
+                    renderPreview={(team) => <TeamPreview team={team} />}
+                    renderContextMenu={(team) => <TeamContextMenu team={team} />}
+                  />
+                </>
               )
             )}
           </GridSection>
@@ -108,14 +114,19 @@ export function GitHubExplorer() {
               <p>Loading…</p>
             ) : (
               filteredMembers.length > 0 && (
-                <SquareGrid
-                  items={filteredMembers}
-                  label="Member"
-                  getLabel={(member) => member.login}
-                  onPick={(member) => openInGitHub(member.html_url)}
-                  renderPreview={(member) => <MemberPreview member={member} />}
-                  renderContextMenu={(member) => <MemberContextMenu member={member} />}
-                />
+                <>
+                  <MemberLegend />
+                  <SquareGrid
+                    items={filteredMembers}
+                    label="Member"
+                    getLabel={(member) => member.login}
+                    getStatus={memberSquareStatus}
+                    getImage={(member) => githubAvatarUrl(member.avatar_url, 56)}
+                    onPick={(member) => openInGitHub(member.html_url)}
+                    renderPreview={(member) => <MemberPreview member={member} />}
+                    renderContextMenu={(member) => <MemberContextMenu member={member} />}
+                  />
+                </>
               )
             )}
           </GridSection>

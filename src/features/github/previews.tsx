@@ -1,6 +1,15 @@
 import { Popover } from '@base-ui/react/popover';
-import { formatDate, isOldRelease, isStale, isVersionTag } from './status';
-import type { IssueOrPull, Member, Release, Repo, RepoCi, Tag, Team } from './types';
+import { GitHubAvatar } from './avatars';
+import {
+  formatDate,
+  isBotMember,
+  isOldRelease,
+  isStale,
+  isVersionTag,
+  teamPermission,
+  workflowRunStateLabel,
+} from './status';
+import type { IssueOrPull, Member, Release, Repo, RepoCi, Tag, Team, WorkflowRun } from './types';
 
 export function RepoPreview({ repo }: { repo: Repo & { ci?: RepoCi } }) {
   return (
@@ -19,6 +28,23 @@ export function RepoPreview({ repo }: { repo: Repo & { ci?: RepoCi } }) {
   );
 }
 
+export function WorkflowRunPreview({ run }: { run: WorkflowRun }) {
+  return (
+    <div className="preview">
+      <Popover.Title>{run.display_title || run.name}</Popover.Title>
+      <Popover.Description>{run.name}</Popover.Description>
+      <div className="meta">
+        <span>{workflowRunStateLabel(run)}</span>
+        <span>#{run.run_number}</span>
+        <span>{run.event}</span>
+        {run.head_branch && <span>{run.head_branch}</span>}
+        {run.actor?.login && <span>{run.actor.login}</span>}
+        <span>Started {formatDate(run.run_started_at || run.created_at)}</span>
+      </div>
+    </div>
+  );
+}
+
 export function TeamPreview({ team }: { team: Team }) {
   return (
     <div className="preview">
@@ -27,7 +53,10 @@ export function TeamPreview({ team }: { team: Team }) {
       <div className="meta">
         <span>{team.slug}</span>
         {team.privacy && <span>{team.privacy}</span>}
-        {team.permission && <span>{team.permission}</span>}
+        <span>{teamPermission(team)} permission</span>
+        {typeof team.members_count === 'number' && <span>{team.members_count} members</span>}
+        {typeof team.repos_count === 'number' && <span>{team.repos_count} repos</span>}
+        {team.parent && <span>child of {team.parent.name}</span>}
       </div>
     </div>
   );
@@ -36,10 +65,21 @@ export function TeamPreview({ team }: { team: Team }) {
 export function MemberPreview({ member }: { member: Member }) {
   return (
     <div className="preview">
-      <Popover.Title>{member.login}</Popover.Title>
-      <Popover.Description>{member.type}</Popover.Description>
+      <div className="previewHeader">
+        <GitHubAvatar
+          className="previewAvatar"
+          src={member.avatar_url}
+          label={member.login}
+          size={96}
+        />
+        <div>
+          <Popover.Title>{member.login}</Popover.Title>
+          <Popover.Description>{member.type}</Popover.Description>
+        </div>
+      </div>
       <div className="meta">
-        <span>member</span>
+        <span>{isBotMember(member) ? 'bot' : 'user'}</span>
+        {member.site_admin && <span>site admin</span>}
         <span>click opens GitHub</span>
       </div>
     </div>

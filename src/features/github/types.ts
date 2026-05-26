@@ -18,6 +18,9 @@ export type Team = {
   description: string | null;
   privacy?: string;
   permission?: string;
+  members_count?: number;
+  repos_count?: number;
+  parent?: { id: number; name: string; slug: string } | null;
   html_url: string;
 };
 
@@ -27,6 +30,7 @@ export type Member = {
   avatar_url: string;
   html_url: string;
   type: string;
+  site_admin?: boolean;
 };
 
 export type RepoCi = {
@@ -73,8 +77,24 @@ export type Tag = {
 };
 
 export type WorkflowRun = {
+  id: number;
   name: string;
+  display_title: string;
   status: string;
   conclusion: string | null;
   html_url: string;
+  event: string;
+  head_branch: string | null;
+  head_sha: string;
+  run_number: number;
+  run_attempt: number;
+  created_at: string;
+  updated_at: string;
+  run_started_at: string | null;
+  actor: { login: string } | null;
+};
+
+export type WorkflowRunsResponse = {
+  total_count: number;
+  workflow_runs?: WorkflowRun[];
 };
