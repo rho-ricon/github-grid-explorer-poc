@@ -11,6 +11,7 @@ import { MemberPreview, RepoPreview, TeamPreview } from './previews';
 import { filterItems, memberSearchText, repoSearchText, teamSearchText } from './search';
 import type { Member, Repo, RepoWithCi, Team } from './types';
 import { RepoScreen } from './RepoScreen';
+import { TeamScreen } from './TeamScreen';
 import { TokenSettings } from './TokenSettings';
 
 export function GitHubExplorer() {
@@ -31,7 +32,9 @@ export function GitHubExplorer() {
     ...repo,
     ci: ciByRepo[repo.id] || { state: 'loading', label: 'Loading CI…' },
   }));
-  const [repo, setRepo] = useState<Repo | null>(null);
+  const [selection, setSelection] = useState<
+    { type: 'repo'; repo: Repo } | { type: 'team'; team: Team } | null
+  >(null);
   const [query, setQuery] = useState('');
   const loading = repos.loading || teams.loading || members.loading;
 
@@ -49,7 +52,7 @@ export function GitHubExplorer() {
   );
 
   return (
-    <Drawer.Root open={repo !== null} onOpenChange={(open) => !open && setRepo(null)}>
+    <Drawer.Root open={selection !== null} onOpenChange={(open) => !open && setSelection(null)}>
       <Screen
         title={ORG}
         search={query}
@@ -74,7 +77,7 @@ export function GitHubExplorer() {
                     label="Repository"
                     getLabel={(r) => r.name}
                     getStatus={(r) => r.ci.state}
-                    onPick={(r) => setRepo(r)}
+                    onPick={(repo) => setSelection({ type: 'repo', repo })}
                     renderPreview={(r) => <RepoPreview repo={r} />}
                     renderContextMenu={(r) => <RepoContextMenu repo={r} />}
                   />
@@ -92,7 +95,7 @@ export function GitHubExplorer() {
                   items={filteredTeams}
                   label="Team"
                   getLabel={(team) => team.name}
-                  onPick={(team) => openInGitHub(team.html_url)}
+                  onPick={(team) => setSelection({ type: 'team', team })}
                   renderPreview={(team) => <TeamPreview team={team} />}
                   renderContextMenu={(team) => <TeamContextMenu team={team} />}
                 />
@@ -121,7 +124,10 @@ export function GitHubExplorer() {
 
       <Drawer.Portal>
         <Drawer.Viewport className="viewport">
-          <Drawer.Popup className="drawer">{repo && <RepoScreen repo={repo} />}</Drawer.Popup>
+          <Drawer.Popup className="drawer">
+            {selection?.type === 'repo' && <RepoScreen repo={selection.repo} />}
+            {selection?.type === 'team' && <TeamScreen team={selection.team} />}
+          </Drawer.Popup>
         </Drawer.Viewport>
       </Drawer.Portal>
     </Drawer.Root>
