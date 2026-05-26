@@ -477,6 +477,19 @@ h2 {
   font-weight: 700;
 }
 
+.square[data-draggable='true'] {
+  cursor: grab;
+}
+
+.square[data-draggable='true']:active {
+  cursor: grabbing;
+}
+
+.square[data-droppable='true'] {
+  outline: 3px dashed #06b6d4;
+  outline-offset: -7px;
+}
+
 .square:hover,
 .square[data-popup-open] {
   background: white !important;
@@ -532,6 +545,16 @@ h2 {
   height: 1px;
   margin: 4px;
   background: black;
+}
+
+.dropMenuLabel {
+  max-width: 220px;
+  padding: 8px 10px 6px;
+  color: #555;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .viewport {

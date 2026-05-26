@@ -31,7 +31,7 @@ import type { IssueOrPull, Release, Repo, Tag, WorkflowRunsResponse } from './ty
 import { ItemScreen } from './ItemScreen';
 import { TokenSettings } from './TokenSettings';
 
-export function RepoScreen({ repo }: { repo: Repo }) {
+export function RepoScreen({ repo, initialQuery = '' }: { repo: Repo; initialQuery?: string }) {
   const workflowRunData = useGitHubData<WorkflowRunsResponse>(
     githubPath(`/repos/${repo.full_name}/actions/runs?per_page=100`),
     'Could not load workflow runs.',
@@ -53,8 +53,8 @@ export function RepoScreen({ repo }: { repo: Repo }) {
 
   useEffect(() => {
     setItem(null);
-    setQuery('');
-  }, [repo.id]);
+    setQuery(initialQuery);
+  }, [repo.id, initialQuery]);
 
   const workflowRuns = useMemo(
     () => filterItems(workflowRunData.data?.workflow_runs || [], query, workflowRunSearchText),

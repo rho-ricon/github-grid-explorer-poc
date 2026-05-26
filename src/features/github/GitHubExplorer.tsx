@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type DragEvent, type ReactNode } from 'react';
 import { Drawer } from '@base-ui/react/drawer';
+import { Menu } from '@base-ui/react/menu';
 import { GridSection } from '../../components/GridSection';
 import { Screen } from '../../components/Screen';
 import { SquareGrid } from '../../components/SquareGrid';
@@ -15,6 +16,13 @@ import type { Member, Repo, RepoWithCi, Team } from './types';
 import { RepoScreen } from './RepoScreen';
 import { TeamScreen } from './TeamScreen';
 import { TokenSettings } from './TokenSettings';
+
+type MemberRepoDropMenuState = {
+  member: Member;
+  repo: RepoWithCi;
+  x: number;
+  y: number;
+};
 
 export function GitHubExplorer() {
   const repos = useGitHubList<Repo>(
@@ -35,8 +43,10 @@ export function GitHubExplorer() {
     ci: ciByRepo[repo.id] || { state: 'loading', label: 'Loading CI…' },
   }));
   const [selection, setSelection] = useState<
-    { type: 'repo'; repo: Repo } | { type: 'team'; team: Team } | null
+    { type: 'repo'; repo: Repo; initialQuery?: string } | { type: 'team'; team: Team } | null
   >(null);
+  const [dragged, setDragged] = useState<{ type: 'member'; member: Member } | null>(null);
+  const [dropMenu, setDropMenu] = useState<MemberRepoDropMenuState | null>(null);
   const [query, setQuery] = useState('');
   const loading = repos.loading || teams.loading || members.loading;
 
@@ -52,6 +62,18 @@ export function GitHubExplorer() {
     () => filterItems(members.items, query, memberSearchText),
     [members.items, query],
   );
+
+  function handleMemberDropOnRepo(repo: RepoWithCi, event: DragEvent<HTMLElement>) {
+    if (!dragged) return;
+
+    setDropMenu({
+      member: dragged.member,
+      repo,
+      x: event.clientX,
+      y: event.clientY,
+    });
+    setDragged(null);
+  }
 
   return (
     <Drawer.Root open={selection !== null} onOpenChange={(open) => !open && setSelection(null)}>
@@ -80,6 +102,7 @@ export function GitHubExplorer() {
                     getLabel={(r) => r.name}
                     getStatus={(r) => r.ci.state}
                     onPick={(repo) => setSelection({ type: 'repo', repo })}
+                    onDrop={dragged ? handleMemberDropOnRepo : undefined}
                     renderPreview={(r) => <RepoPreview repo={r} />}
                     renderContextMenu={(r) => <RepoContextMenu repo={r} />}
                   />
@@ -123,6 +146,8 @@ export function GitHubExplorer() {
                     getStatus={memberSquareStatus}
                     getImage={(member) => githubAvatarUrl(member.avatar_url, 56)}
                     onPick={(member) => openInGitHub(member.html_url)}
+                    onDragStart={(member) => setDragged({ type: 'member', member })}
+                    onDragEnd={() => setDragged(null)}
                     renderPreview={(member) => <MemberPreview member={member} />}
                     renderContextMenu={(member) => <MemberContextMenu member={member} />}
                   />
@@ -133,14 +158,107 @@ export function GitHubExplorer() {
         </div>
       </Screen>
 
+      <MemberRepoDropMenu
+        drop={dropMenu}
+        onClose={() => setDropMenu(null)}
+        onShowWork={(drop) => {
+          setSelection({ type: 'repo', repo: drop.repo, initialQuery: drop.member.login });
+          setDropMenu(null);
+        }}
+      />
+
       <Drawer.Portal>
         <Drawer.Viewport className="viewport">
           <Drawer.Popup className="drawer">
-            {selection?.type === 'repo' && <RepoScreen repo={selection.repo} />}
+            {selection?.type === 'repo' && (
+              <RepoScreen repo={selection.repo} initialQuery={selection.initialQuery} />
+            )}
             {selection?.type === 'team' && <TeamScreen team={selection.team} />}
           </Drawer.Popup>
         </Drawer.Viewport>
       </Drawer.Portal>
     </Drawer.Root>
   );
+}
+
+function MemberRepoDropMenu({
+  drop,
+  onClose,
+  onShowWork,
+}: {
+  drop: MemberRepoDropMenuState | null;
+  onClose: () => void;
+  onShowWork: (drop: MemberRepoDropMenuState) => void;
+}) {
+  const anchor = useMemo(() => (drop ? pointAnchor(drop.x, drop.y) : null), [drop]);
+
+  return (
+    <Menu.Root open={drop !== null} onOpenChange={(open) => !open && onClose()} modal={false}>
+      <Menu.Portal>
+        <Menu.Positioner
+          className="contextMenuPositioner"
+          anchor={anchor}
+          positionMethod="fixed"
+          side="bottom"
+          align="start"
+          sideOffset={6}
+        >
+          <Menu.Popup className="contextMenuPopup">
+            {drop && (
+              <>
+                <div className="dropMenuLabel">
+                  {drop.member.login} → {drop.repo.name}
+                </div>
+                <DropMenuItem onClick={() => onShowWork(drop)}>
+                  Show this member’s repo work
+                </DropMenuItem>
+                <Menu.Separator className="contextMenuSeparator" />
+                <DropMenuItem
+                  onClick={() => {
+                    openInGitHub(drop.member.html_url);
+                    onClose();
+                  }}
+                >
+                  Open member on GitHub
+                </DropMenuItem>
+                <DropMenuItem
+                  onClick={() => {
+                    openInGitHub(drop.repo.html_url);
+                    onClose();
+                  }}
+                >
+                  Open repo on GitHub
+                </DropMenuItem>
+              </>
+            )}
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Portal>
+    </Menu.Root>
+  );
+}
+
+function DropMenuItem({ children, onClick }: { children: ReactNode; onClick: () => void }) {
+  return (
+    <Menu.Item className="contextMenuItem" onClick={onClick}>
+      {children}
+    </Menu.Item>
+  );
+}
+
+function pointAnchor(x: number, y: number) {
+  return {
+    getBoundingClientRect() {
+      return {
+        x,
+        y,
+        width: 0,
+        height: 0,
+        top: y,
+        right: x,
+        bottom: y,
+        left: x,
+      };
+    },
+  };
 }

@@ -13,7 +13,7 @@ export function GitHubAvatar({
 }) {
   return (
     <Avatar.Root className={className} title={label}>
-      <Avatar.Image className="avatarImage" src={githubAvatarUrl(src, size)} alt={label} />
+      <Avatar.Image className="avatarImage" src={githubAvatarUrl(src, size)} alt={label} draggable={false} />
       <Avatar.Fallback className="avatarFallback" delay={200}>
         {avatarFallbackText(label)}
       </Avatar.Fallback>
