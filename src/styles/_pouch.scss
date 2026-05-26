@@ -1,0 +1,179 @@
+@use 'tokens' as *;
+
+.pouch {
+  position: fixed;
+  z-index: 60;
+  right: 16px;
+  bottom: 16px;
+  width: min(300px, calc(100vw - 32px));
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  pointer-events: none;
+
+  &[data-droppable='true'] .pouchToggle,
+  &[data-droppable='true'] .pouchPanel {
+    outline: 3px dashed $drop-target;
+    outline-offset: 3px;
+  }
+}
+
+.pouchToggle,
+.pouchPanel {
+  pointer-events: auto;
+}
+
+.pouchToggle {
+  @include action-control;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  box-shadow: $shadow;
+
+  &:hover,
+  &:focus-visible {
+    @include action-control-hover;
+  }
+
+  &:active {
+    @include action-control-active;
+  }
+
+  span {
+    min-width: 1.5em;
+    border: 1px solid $black;
+    padding: 1px 5px;
+    text-align: center;
+  }
+}
+
+.pouchPanel {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+  border: $border;
+  background: $white;
+  padding: 10px;
+  box-shadow: $shadow;
+}
+
+.pouchHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: $text-muted;
+  font-size: 12px;
+}
+
+.pouchClear,
+.pouchRemove,
+.pouchItemDrag {
+  border: $border;
+  background: $white;
+  color: $black;
+  cursor: pointer;
+}
+
+.pouchClear {
+  padding: 3px 6px;
+}
+
+.pouchEmpty {
+  color: $text-muted;
+  font-size: 13px;
+}
+
+.pouchItems {
+  display: grid;
+  gap: 6px;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.pouchItem {
+  display: grid;
+  grid-template-columns: 36px 1fr 28px;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+
+  &[data-kind='repo'] .pouchItemDrag {
+    background: $neutral;
+  }
+
+  &[data-kind='team'] .pouchItemDrag {
+    background: $team-pull;
+  }
+
+  &[data-kind='member'] .pouchItemDrag {
+    background: $surface-muted;
+  }
+
+  &[data-ci='success'] .pouchItemDrag { background: $success; }
+  &[data-ci='failure'] .pouchItemDrag { background: $failure; }
+  &[data-ci='running'] .pouchItemDrag { background: $running; }
+  &[data-ci~='team'][data-ci~='admin'] .pouchItemDrag { background: $team-admin; }
+  &[data-ci~='team'][data-ci~='maintain'] .pouchItemDrag { background: $team-maintain; }
+  &[data-ci~='team'][data-ci~='push'] .pouchItemDrag { background: $team-push; }
+  &[data-ci~='team'][data-ci~='triage'] .pouchItemDrag { background: $team-triage; }
+  &[data-ci~='team'][data-ci~='pull'] .pouchItemDrag { background: $team-pull; }
+}
+
+.pouchItemDrag {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 0;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.pouchAvatar {
+  width: 100%;
+  height: 100%;
+  display: inline-grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.pouchGlyph {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pouchItemText {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+
+  strong,
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    font-size: 13px;
+  }
+
+  span {
+    color: $text-muted;
+    font-size: 12px;
+  }
+}
+
+.pouchRemove {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1;
+}

@@ -22,6 +22,7 @@ Open http://localhost:5173/.
 - Right-click a square for Base UI `ContextMenu` actions.
 - Drag a member onto a repo for non-mutating relationship actions.
 - Drag a repo onto another repo for a side-by-side operational comparison.
+- Carry repos, teams, and members in a floating pouch across drawer views.
 - Search filters all grids on the current screen.
 - Caches GitHub API responses in browser storage.
 

@@ -9,18 +9,22 @@ import { githubAvatarUrl } from './avatars';
 import { MemberContextMenu, RepoContextMenu, TeamContextMenu } from './contextMenus';
 import { useGitHubList, useRepoCiStatuses } from './hooks';
 import { CiLegend, MemberLegend, TeamLegend } from './legends';
+import { Pouch, type PouchItem } from './Pouch';
 import { MemberPreview, RepoPreview, TeamPreview } from './previews';
 import { filterItems, memberSearchText, repoSearchText, teamSearchText } from './search';
 import { memberSquareStatus, teamSquareStatus } from './status';
-import type { Member, Repo, RepoWithCi, Team } from './types';
+import type { IssueOrPull, Member, Repo, RepoWithCi, Team } from './types';
 import { RepoCompareScreen } from './RepoCompareScreen';
 import { RepoScreen } from './RepoScreen';
 import { TeamScreen } from './TeamScreen';
 import { TokenSettings } from './TokenSettings';
 
-type DraggedSquare =
-  | { type: 'member'; member: Member }
-  | { type: 'repo'; repo: RepoWithCi };
+type CarriedItem =
+  | (PouchItem & { kind: 'member'; member: Member })
+  | (PouchItem & { kind: 'repo'; repo: RepoWithCi })
+  | (PouchItem & { kind: 'team'; team: Team });
+
+type DraggedSquare = CarriedItem;
 
 type MemberRepoDropMenuState = {
   type: 'member-repo';
@@ -38,7 +42,16 @@ type RepoRepoDropMenuState = {
   y: number;
 };
 
-type DropMenuState = MemberRepoDropMenuState | RepoRepoDropMenuState;
+type MemberIssueDropMenuState = {
+  type: 'member-issue';
+  member: Member;
+  repo: Repo;
+  item: IssueOrPull;
+  x: number;
+  y: number;
+};
+
+type DropMenuState = MemberRepoDropMenuState | RepoRepoDropMenuState | MemberIssueDropMenuState;
 
 export function GitHubExplorer() {
   const repos = useGitHubList<Repo>(
@@ -66,6 +79,7 @@ export function GitHubExplorer() {
   >(null);
   const [dragged, setDragged] = useState<DraggedSquare | null>(null);
   const [dropMenu, setDropMenu] = useState<DropMenuState | null>(null);
+  const [pouchedItems, setPouchedItems] = useState<CarriedItem[]>([]);
   const [query, setQuery] = useState('');
   const loading = repos.loading || teams.loading || members.loading;
 
@@ -82,10 +96,27 @@ export function GitHubExplorer() {
     [members.items, query],
   );
 
+  const draggedMember = dragged?.kind === 'member' ? dragged.member : null;
+  const canDropOnRepo = dragged?.kind === 'member' || dragged?.kind === 'repo';
+
+  function addToPouch(item: CarriedItem) {
+    setPouchedItems((current) =>
+      current.some((currentItem) => currentItem.key === item.key) ? current : [...current, item],
+    );
+  }
+
+  function handlePouchDrop(event: DragEvent<HTMLElement>) {
+    if (!dragged) return;
+
+    event.preventDefault();
+    addToPouch(dragged);
+    setDragged(null);
+  }
+
   function handleDropOnRepo(repo: RepoWithCi, event: DragEvent<HTMLElement>) {
     if (!dragged) return;
 
-    if (dragged.type === 'member') {
+    if (dragged.kind === 'member') {
       setDropMenu({
         type: 'member-repo',
         member: dragged.member,
@@ -95,7 +126,7 @@ export function GitHubExplorer() {
       });
     }
 
-    if (dragged.type === 'repo' && dragged.repo.id !== repo.id) {
+    if (dragged.kind === 'repo' && dragged.repo.id !== repo.id) {
       setDropMenu({
         type: 'repo-repo',
         source: dragged.repo,
@@ -135,9 +166,9 @@ export function GitHubExplorer() {
                     getLabel={(r) => r.name}
                     getStatus={(r) => r.ci.state}
                     onPick={(repo) => setSelection({ type: 'repo', repo })}
-                    onDragStart={(repo) => setDragged({ type: 'repo', repo })}
+                    onDragStart={(repo) => setDragged(repoToPouchItem(repo))}
                     onDragEnd={() => setDragged(null)}
-                    onDrop={dragged ? handleDropOnRepo : undefined}
+                    onDrop={canDropOnRepo ? handleDropOnRepo : undefined}
                     renderPreview={(r) => <RepoPreview repo={r} />}
                     renderContextMenu={(r) => <RepoContextMenu repo={r} />}
                   />
@@ -159,6 +190,8 @@ export function GitHubExplorer() {
                     getLabel={(team) => team.name}
                     getStatus={teamSquareStatus}
                     onPick={(team) => setSelection({ type: 'team', team })}
+                    onDragStart={(team) => setDragged(teamToPouchItem(team))}
+                    onDragEnd={() => setDragged(null)}
                     renderPreview={(team) => <TeamPreview team={team} />}
                     renderContextMenu={(team) => <TeamContextMenu team={team} />}
                   />
@@ -181,7 +214,7 @@ export function GitHubExplorer() {
                     getStatus={memberSquareStatus}
                     getImage={(member) => githubAvatarUrl(member.avatar_url, 56)}
                     onPick={(member) => openInGitHub(member.html_url)}
-                    onDragStart={(member) => setDragged({ type: 'member', member })}
+                    onDragStart={(member) => setDragged(memberToPouchItem(member))}
                     onDragEnd={() => setDragged(null)}
                     renderPreview={(member) => <MemberPreview member={member} />}
                     renderContextMenu={(member) => <MemberContextMenu member={member} />}
@@ -193,11 +226,23 @@ export function GitHubExplorer() {
         </div>
       </Screen>
 
+      <Pouch
+        items={pouchedItems}
+        canDrop={Boolean(dragged)}
+        onDrop={handlePouchDrop}
+        onDragItem={(item) => setDragged(item)}
+        onDragEnd={() => setDragged(null)}
+        onRemove={(item) =>
+          setPouchedItems((current) => current.filter((currentItem) => currentItem.key !== item.key))
+        }
+        onClear={() => setPouchedItems([])}
+      />
+
       <RelationshipDropMenu
         drop={dropMenu}
         onClose={() => setDropMenu(null)}
-        onShowWork={(drop) => {
-          setSelection({ type: 'repo', repo: drop.repo, initialQuery: drop.member.login });
+        onShowWork={(repo, member) => {
+          setSelection({ type: 'repo', repo, initialQuery: member.login });
           setDropMenu(null);
         }}
         onCompareRepos={(drop) => {
@@ -210,7 +255,22 @@ export function GitHubExplorer() {
         <Drawer.Viewport className="viewport">
           <Drawer.Popup className="drawer">
             {selection?.type === 'repo' && (
-              <RepoScreen repo={selection.repo} initialQuery={selection.initialQuery} />
+              <RepoScreen
+                repo={selection.repo}
+                initialQuery={selection.initialQuery}
+                draggedMember={draggedMember}
+                onMemberIssueDrop={(member, item, event) => {
+                  setDropMenu({
+                    type: 'member-issue',
+                    member,
+                    repo: selection.repo,
+                    item,
+                    x: event.clientX,
+                    y: event.clientY,
+                  });
+                  setDragged(null);
+                }}
+              />
             )}
             {selection?.type === 'team' && <TeamScreen team={selection.team} />}
             {selection?.type === 'repo-compare' && (
@@ -231,7 +291,7 @@ function RelationshipDropMenu({
 }: {
   drop: DropMenuState | null;
   onClose: () => void;
-  onShowWork: (drop: MemberRepoDropMenuState) => void;
+  onShowWork: (repo: Repo, member: Member) => void;
   onCompareRepos: (drop: RepoRepoDropMenuState) => void;
 }) {
   const anchor = useMemo(() => (drop ? pointAnchor(drop.x, drop.y) : null), [drop]);
@@ -253,7 +313,7 @@ function RelationshipDropMenu({
                 <div className="dropMenuLabel">
                   {drop.member.login} → {drop.repo.name}
                 </div>
-                <DropMenuItem onClick={() => onShowWork(drop)}>
+                <DropMenuItem onClick={() => onShowWork(drop.repo, drop.member)}>
                   Show this member’s repo work
                 </DropMenuItem>
                 <Menu.Separator className="contextMenuSeparator" />
@@ -272,6 +332,34 @@ function RelationshipDropMenu({
                   }}
                 >
                   Open repo on GitHub
+                </DropMenuItem>
+              </>
+            )}
+
+            {drop?.type === 'member-issue' && (
+              <>
+                <div className="dropMenuLabel">
+                  {drop.member.login} → #{drop.item.number}
+                </div>
+                <DropMenuItem onClick={() => onShowWork(drop.repo, drop.member)}>
+                  Show this member’s repo work
+                </DropMenuItem>
+                <Menu.Separator className="contextMenuSeparator" />
+                <DropMenuItem
+                  onClick={() => {
+                    openInGitHub(drop.item.html_url);
+                    onClose();
+                  }}
+                >
+                  Open issue/PR on GitHub
+                </DropMenuItem>
+                <DropMenuItem
+                  onClick={() => {
+                    openInGitHub(drop.member.html_url);
+                    onClose();
+                  }}
+                >
+                  Open member on GitHub
                 </DropMenuItem>
               </>
             )}
@@ -306,6 +394,40 @@ function RelationshipDropMenu({
       </Menu.Portal>
     </Menu.Root>
   );
+}
+
+function memberToPouchItem(member: Member): CarriedItem {
+  return {
+    key: `member:${member.id}`,
+    kind: 'member',
+    label: member.login,
+    description: member.type,
+    image: githubAvatarUrl(member.avatar_url, 56),
+    status: memberSquareStatus(member),
+    member,
+  };
+}
+
+function repoToPouchItem(repo: RepoWithCi): CarriedItem {
+  return {
+    key: `repo:${repo.id}`,
+    kind: 'repo',
+    label: repo.name,
+    description: repo.ci.label,
+    status: repo.ci.state,
+    repo,
+  };
+}
+
+function teamToPouchItem(team: Team): CarriedItem {
+  return {
+    key: `team:${team.id}`,
+    kind: 'team',
+    label: team.name,
+    description: team.permission || team.privacy || 'team',
+    status: teamSquareStatus(team),
+    team,
+  };
 }
 
 function DropMenuItem({ children, onClick }: { children: ReactNode; onClick: () => void }) {
