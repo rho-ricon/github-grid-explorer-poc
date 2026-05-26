@@ -1,8 +1,10 @@
 # GitHub Grid Explorer PoC
 
-A Bun + Vite + React + Base UI experiment for visualizing a GitHub org as square grids.
+A Bun + Vite + React + Base UI experiment for exploring a GitHub org as small stateful square grids.
 
-## Run
+Live app: https://rho-ricon.github.io/github-grid-explorer-poc/
+
+## Run locally
 
 ```bash
 bun install
@@ -13,15 +15,80 @@ Open http://localhost:5173/.
 
 ## What it does
 
-- Org view with separate grids for repos, teams, and members
-- Repo squares show latest GitHub Actions status
-- Hover/focus squares to see Base UI Popover previews
-- Click repo squares to drill into full-screen Base UI Drawer views
-- Repo view splits issues and pull requests into separate grids
-- Issue/PR squares encode open/closed, stale, and busy states
-- GitHub API responses are cached in browser localStorage
+- Shows a GitHub org as separate grids for repos, teams, and members.
+- Uses square color/state to make dense data scannable.
+- Hover/focus a square to see a Base UI `Popover` preview.
+- Click a square to drill into full-screen Base UI `Drawer` views.
+- Right-click a square for Base UI `ContextMenu` actions.
+- Search filters all grids on the current screen.
+- Caches GitHub API responses in browser storage.
 
-## GitHub API
+## Views
 
-During local development, Vite proxies `/github/*` requests to `https://api.github.com/*`.
-If `gh auth token` is available, the proxy uses it server-side so the token is not exposed to browser code.
+### Org view
+
+- **Repos** — latest GitHub Actions state colors each repo square.
+- **Teams** — click to view team members. Requires a token with org/member read access.
+- **Members** — public org members, or token-visible members.
+
+### Repo view
+
+- **Issues** — open/closed, stale, and busy states.
+- **Pull Requests** — open/closed, stale, and busy states.
+- **Releases** — GitHub Releases, including stable/prerelease/draft/old states.
+- **Tags** — git tags, with version tags highlighted.
+
+### Team view
+
+- **Members** — team members as a searchable grid.
+
+## Token support
+
+The app works without a token, but unauthenticated GitHub API requests are heavily rate-limited and cannot read private/org-restricted data.
+
+Use the **Token** button in the app to paste a fine-grained GitHub token. The token is:
+
+- stored in memory by default,
+- optionally remembered in this browser's `localStorage`,
+- cleared with the **Clear** button.
+
+The token popover includes a link to GitHub's fine-grained token form prefilled for a short-lived read-only token for `KnickKnackLabs`.
+
+## GitHub API behavior
+
+### Local development
+
+In dev, requests go through Vite's local `/github/*` proxy when no browser token is set. The proxy uses `gh auth token` server-side if available, so the token is not exposed to browser code.
+
+The proxy is local-only and rejects non-local requests.
+
+### GitHub Pages / production
+
+On GitHub Pages, the app calls `https://api.github.com` directly. If a user provides a token, it is sent from that user's browser to GitHub.
+
+No token is committed, built into the app, or available to GitHub Pages.
+
+## Build
+
+```bash
+bun run build
+```
+
+For GitHub Pages, the deploy workflow builds with:
+
+```bash
+GITHUB_PAGES=true bun run build
+```
+
+## Project shape
+
+- `src/components/` — generic screen/grid primitives.
+- `src/features/github/` — GitHub data, auth, search, previews, legends, context menus, and drawer screens.
+- `src/utils/` — small cache/clipboard helpers.
+- `.github/workflows/deploy.yml` — GitHub Pages deployment.
+
+## Possible next experiments
+
+- Add a Workflow Runs grid to repo view.
+- Use Base UI `Meter` for CI success rate, milestone progress, or activity/freshness.
+- Prototype non-mutating drag/drop gestures, such as comparing squares or filtering repo work by member.
