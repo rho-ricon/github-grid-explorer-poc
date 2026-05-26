@@ -6,6 +6,7 @@ export function Screen({
   leading,
   search,
   onSearchChange,
+  actions,
   children,
 }: {
   title: string;
@@ -13,6 +14,7 @@ export function Screen({
   leading?: ReactNode;
   search?: string;
   onSearchChange?: (value: string) => void;
+  actions?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -21,6 +23,7 @@ export function Screen({
         {leading}
         <h1>{title}</h1>
         {count && <span>{count}</span>}
+        <div className="topbarSpacer" />
         {onSearchChange && (
           <input
             className="search"
@@ -30,6 +33,7 @@ export function Screen({
             aria-label={`Search ${title}`}
           />
         )}
+        {actions}
       </header>
       <main className="center">{children}</main>
     </div>

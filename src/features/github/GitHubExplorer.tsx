@@ -11,6 +11,7 @@ import { MemberPreview, RepoPreview, TeamPreview } from './previews';
 import { filterItems, memberSearchText, repoSearchText, teamSearchText } from './search';
 import type { Member, Repo, RepoWithCi, Team } from './types';
 import { RepoScreen } from './RepoScreen';
+import { TokenSettings } from './TokenSettings';
 
 export function GitHubExplorer() {
   const repos = useGitHubList<Repo>(
@@ -53,6 +54,7 @@ export function GitHubExplorer() {
         title={ORG}
         search={query}
         onSearchChange={setQuery}
+        actions={<TokenSettings />}
         count={
           loading
             ? 'Loading org…'

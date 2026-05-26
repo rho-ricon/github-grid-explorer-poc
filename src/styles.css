@@ -36,9 +36,12 @@ body {
   color: #666;
 }
 
+.topbarSpacer {
+  flex: 1;
+}
+
 .search {
   width: min(320px, 32vw);
-  margin-left: auto;
   border: 2px solid black;
   background: white;
   color: black;
@@ -49,6 +52,65 @@ body {
 .search:focus {
   outline: 2px solid black;
   outline-offset: 2px;
+}
+
+.tokenButton {
+  border: 2px solid black;
+  background: white;
+  color: black;
+  padding: 8px 12px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.tokenPopover {
+  width: min(360px, calc(100vw - 24px));
+  display: grid;
+  gap: 10px;
+  border: 2px solid black;
+  background: white;
+  padding: 12px;
+  box-shadow: 4px 4px 0 black;
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.tokenPopover[data-starting-style],
+.tokenPopover[data-ending-style] {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+.tokenTitle,
+.tokenDescription {
+  margin: 0;
+}
+
+.tokenDescription {
+  color: #555;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.tokenInput {
+  border: 2px solid black;
+  background: white;
+  color: black;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.rememberToken,
+.tokenActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tokenActions {
+  justify-content: flex-end;
 }
 
 .center {

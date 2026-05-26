@@ -1,15 +1,22 @@
-import { useEffect, useState } from 'react';
-import { cacheKey, readCache } from '../../utils/cache';
-import { CACHE_TTL, CI_CACHE_TTL, fetchCachedJson, githubPath } from './api';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  CACHE_TTL,
+  CI_CACHE_TTL,
+  fetchCachedJson,
+  githubPath,
+  readCachedJson,
+} from './api';
+import { useGitHubAuth } from './auth';
 import type { Repo, RepoCi, WorkflowRun } from './types';
 
 const loadingCi: RepoCi = { state: 'loading', label: 'Loading CI…' };
-const ciCache = new Map<number, RepoCi>();
-const ciPending = new Map<number, Promise<RepoCi>>();
+const ciCache = new Map<string, RepoCi>();
+const ciPending = new Map<string, Promise<RepoCi>>();
 
 export function useGitHubList<T>(url: string, errorMessage: string) {
-  const initialCache = readCache<T[]>(cacheKey(url));
-  const [items, setItems] = useState<T[]>(() => initialCache?.data || []);
+  const auth = useGitHubAuth();
+  const initialCache = readCachedJson<T[]>(url, auth);
+  const [items, setItems] = useState<T[]>(() => initialCache || []);
   const [loading, setLoading] = useState(() => !initialCache);
   const [error, setError] = useState('');
 
@@ -21,10 +28,10 @@ export function useGitHubList<T>(url: string, errorMessage: string) {
         setLoading(true);
         setError('');
 
-        const cached = readCache<T[]>(cacheKey(url));
-        if (cached && active) setItems(cached.data);
+        const cached = readCachedJson<T[]>(url, auth);
+        if (cached && active) setItems(cached);
 
-        const data = await fetchCachedJson<T[]>(url, errorMessage, CACHE_TTL);
+        const data = await fetchCachedJson<T[]>(url, errorMessage, CACHE_TTL, auth);
         if (active) setItems(data);
       } catch (error) {
         if (active) setError(error instanceof Error ? error.message : errorMessage);
@@ -37,12 +44,14 @@ export function useGitHubList<T>(url: string, errorMessage: string) {
     return () => {
       active = false;
     };
-  }, [url, errorMessage]);
+  }, [url, errorMessage, auth.token, auth.rememberToken]);
 
   return { items, loading, error };
 }
 
 export function useRepoCiStatuses(repos: Repo[]) {
+  const auth = useGitHubAuth();
+  const authKey = useMemo(() => (auth.token || import.meta.env.DEV ? 'auth' : 'public'), [auth.token]);
   const [statuses, setStatuses] = useState<Record<number, RepoCi>>({});
 
   useEffect(() => {
@@ -55,15 +64,15 @@ export function useRepoCiStatuses(repos: Repo[]) {
 
     setStatuses(
       Object.fromEntries(
-        repos.map((repo) => [repo.id, ciCache.get(repo.id) || readRepoCiCache(repo) || loadingCi]),
+        repos.map((repo) => [repo.id, ciCache.get(ciKey(repo, authKey)) || readRepoCiCache(repo, auth) || loadingCi]),
       ),
     );
 
     async function load() {
       for (const repo of repos) {
-        if (ciCache.has(repo.id)) continue;
+        if (ciCache.has(ciKey(repo, authKey))) continue;
 
-        const ci = await getRepoCi(repo);
+        const ci = await getRepoCi(repo, auth, authKey);
         if (!active) return;
 
         setStatuses((current) => ({ ...current, [repo.id]: ci }));
@@ -75,42 +84,49 @@ export function useRepoCiStatuses(repos: Repo[]) {
     return () => {
       active = false;
     };
-  }, [repos]);
+  }, [repos, auth.token, auth.rememberToken, authKey]);
 
   return statuses;
 }
 
-function getRepoCi(repo: Repo) {
-  const cached = ciCache.get(repo.id) || readRepoCiCache(repo);
+function getRepoCi(repo: Repo, auth: ReturnType<typeof useGitHubAuth>, authKey: string) {
+  const key = ciKey(repo, authKey);
+  const cached = ciCache.get(key) || readRepoCiCache(repo, auth);
   if (cached) return Promise.resolve(cached);
 
-  const pending = ciPending.get(repo.id);
+  const pending = ciPending.get(key);
   if (pending) return pending;
 
   const request = fetchCachedJson<{ workflow_runs?: WorkflowRun[] }>(
     githubPath(`/repos/${repo.full_name}/actions/runs?per_page=1`),
     'CI unavailable',
     CI_CACHE_TTL,
+    auth,
   )
     .then((data): RepoCi => workflowRunToCi(data.workflow_runs?.[0]))
     .catch((): RepoCi => ({ state: 'unknown', label: 'CI unavailable' }))
     .then((ci) => {
-      ciCache.set(repo.id, ci);
-      ciPending.delete(repo.id);
+      ciCache.set(key, ci);
+      ciPending.delete(key);
       return ci;
     });
 
-  ciPending.set(repo.id, request);
+  ciPending.set(key, request);
   return request;
 }
 
-function readRepoCiCache(repo: Repo) {
-  const cached = readCache<{ workflow_runs?: WorkflowRun[] }>(
-    cacheKey(githubPath(`/repos/${repo.full_name}/actions/runs?per_page=1`)),
+function readRepoCiCache(repo: Repo, auth: ReturnType<typeof useGitHubAuth>) {
+  const cached = readCachedJson<{ workflow_runs?: WorkflowRun[] }>(
+    githubPath(`/repos/${repo.full_name}/actions/runs?per_page=1`),
+    auth,
   );
 
-  if (!cached || cached.expiresAt <= Date.now()) return null;
-  return workflowRunToCi(cached.data.workflow_runs?.[0]);
+  if (!cached) return null;
+  return workflowRunToCi(cached.workflow_runs?.[0]);
+}
+
+function ciKey(repo: Repo, authKey: string) {
+  return `${authKey}:${repo.id}`;
 }
 
 function workflowRunToCi(run: WorkflowRun | undefined): RepoCi {

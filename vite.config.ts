@@ -89,5 +89,6 @@ function githubProxy(): Plugin {
 }
 
 export default defineConfig({
+  base: process.env.GITHUB_PAGES === 'true' ? '/github-grid-explorer-poc/' : '/',
   plugins: [react(), githubProxy()],
 });

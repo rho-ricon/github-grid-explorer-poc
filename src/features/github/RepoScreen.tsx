@@ -17,6 +17,7 @@ import {
 import { issueSquareStatus, releaseSquareStatus, tagSquareStatus, tagUrl } from './status';
 import type { IssueOrPull, Release, Repo, Tag } from './types';
 import { ItemScreen } from './ItemScreen';
+import { TokenSettings } from './TokenSettings';
 
 export function RepoScreen({ repo }: { repo: Repo }) {
   const issueData = useGitHubList<IssueOrPull>(
@@ -61,6 +62,7 @@ export function RepoScreen({ repo }: { repo: Repo }) {
         leading={<Drawer.Close className="back">← Back</Drawer.Close>}
         search={query}
         onSearchChange={setQuery}
+        actions={<TokenSettings />}
         count={
           loading
             ? 'Loading…'
