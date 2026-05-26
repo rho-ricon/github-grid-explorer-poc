@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type DragEvent } from 'react';
 import { Drawer } from '@base-ui/react/drawer';
 import { GridSection } from '../../components/GridSection';
 import { Screen } from '../../components/Screen';
@@ -27,11 +27,21 @@ import {
   tagUrl,
   workflowRunSquareStatus,
 } from './status';
-import type { IssueOrPull, Release, Repo, Tag, WorkflowRunsResponse } from './types';
+import type { IssueOrPull, Member, Release, Repo, Tag, WorkflowRunsResponse } from './types';
 import { ItemScreen } from './ItemScreen';
 import { TokenSettings } from './TokenSettings';
 
-export function RepoScreen({ repo, initialQuery = '' }: { repo: Repo; initialQuery?: string }) {
+export function RepoScreen({
+  repo,
+  initialQuery = '',
+  draggedMember,
+  onMemberIssueDrop,
+}: {
+  repo: Repo;
+  initialQuery?: string;
+  draggedMember?: Member | null;
+  onMemberIssueDrop?: (member: Member, item: IssueOrPull, event: DragEvent<HTMLElement>) => void;
+}) {
   const workflowRunData = useGitHubData<WorkflowRunsResponse>(
     githubPath(`/repos/${repo.full_name}/actions/runs?per_page=100`),
     'Could not load workflow runs.',
@@ -125,6 +135,11 @@ export function RepoScreen({ repo, initialQuery = '' }: { repo: Repo; initialQue
                       getLabel={(i) => `#${i.number} ${i.title}`}
                       getStatus={issueSquareStatus}
                       onPick={setItem}
+                      onDrop={
+                        draggedMember
+                          ? (issue, event) => onMemberIssueDrop?.(draggedMember, issue, event)
+                          : undefined
+                      }
                       renderPreview={(i) => <IssuePreview item={i} />}
                       renderContextMenu={(i) => <IssueContextMenu item={i} />}
                     />
@@ -146,6 +161,11 @@ export function RepoScreen({ repo, initialQuery = '' }: { repo: Repo; initialQue
                       getLabel={(i) => `#${i.number} ${i.title}`}
                       getStatus={issueSquareStatus}
                       onPick={setItem}
+                      onDrop={
+                        draggedMember
+                          ? (pullRequest, event) => onMemberIssueDrop?.(draggedMember, pullRequest, event)
+                          : undefined
+                      }
                       renderPreview={(i) => <IssuePreview item={i} />}
                       renderContextMenu={(i) => <IssueContextMenu item={i} />}
                     />
