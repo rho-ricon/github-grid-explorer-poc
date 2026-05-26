@@ -1,0 +1,145 @@
+@use 'tokens' as *;
+
+.square {
+  width: $square-size;
+  height: $square-size;
+  box-sizing: border-box;
+  display: inline-grid;
+  place-items: center;
+  overflow: hidden;
+  border: $border;
+  background: $black;
+  color: $black;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  transition: background 200ms ease;
+
+  &[data-ci='success'] { background: $success; }
+  &[data-ci='failure'] { background: $failure; }
+  &[data-ci='running'] { background: $running; }
+
+  &[data-ci='neutral'],
+  &[data-ci='none'],
+  &[data-ci='unknown'] {
+    background: $neutral;
+  }
+
+  &[data-ci='loading'] {
+    background: repeating-linear-gradient(45deg, $black 0 6px, $white 6px 12px);
+  }
+
+  &[data-ci~='issue'][data-ci~='open'] { background: $issue-open; }
+  &[data-ci~='issue'][data-ci~='closed'] { background: $issue-closed; }
+  &[data-ci~='pr'][data-ci~='open'] { background: $pr-open; }
+  &[data-ci~='pr'][data-ci~='closed'] { background: $pr-closed; }
+  &[data-ci~='release'][data-ci~='stable'] { background: $release-stable; }
+  &[data-ci~='release'][data-ci~='prerelease'] { background: $release-prerelease; }
+  &[data-ci~='release'][data-ci~='draft'] { background: $release-draft; }
+  &[data-ci~='tag'][data-ci~='version'] { background: $tag-version; }
+  &[data-ci~='tag'][data-ci~='other'] { background: $tag-other; }
+  &[data-ci~='team'][data-ci~='admin'] { background: $team-admin; }
+  &[data-ci~='team'][data-ci~='maintain'] { background: $team-maintain; }
+  &[data-ci~='team'][data-ci~='push'] { background: $team-push; }
+  &[data-ci~='team'][data-ci~='triage'] { background: $team-triage; }
+  &[data-ci~='team'][data-ci~='pull'] { background: $team-pull; }
+  &[data-ci~='team'][data-ci~='unknown'] { background: $neutral; }
+  &[data-ci~='member'][data-ci~='user'] { background: $member-user; }
+
+  &[data-ci~='stale'],
+  &[data-ci~='release'][data-ci~='old'],
+  &[data-ci~='team'][data-ci~='empty'] {
+    opacity: 0.45;
+  }
+
+  &[data-ci~='busy'] {
+    outline: 3px solid $failure;
+    outline-offset: -7px;
+  }
+
+  &[data-ci~='team'][data-ci~='secret'] {
+    outline: 3px solid $team-secret;
+    outline-offset: -7px;
+  }
+
+  &[data-ci~='team'][data-ci~='child'] {
+    border-style: dashed;
+  }
+
+  &[data-ci~='team'][data-ci~='large'] {
+    box-shadow: inset 0 0 0 6px rgb(255 255 255 / 55%);
+  }
+
+  &[data-ci~='member'][data-ci~='bot'] {
+    background: $member-bot;
+    box-shadow: inset 0 0 0 6px rgb(15 118 110 / 85%);
+  }
+
+  &[data-ci~='member'][data-ci~='site-admin'] {
+    outline: 3px solid $site-admin;
+    outline-offset: -7px;
+  }
+
+  &[data-draggable='true'] {
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &[data-droppable='true'] {
+    outline: 3px dashed $drop-target;
+    outline-offset: -7px;
+  }
+
+  &:hover,
+  &[data-popup-open] {
+    background: $white !important;
+  }
+}
+
+.squareContext {
+  width: $square-size;
+  height: $square-size;
+  box-sizing: border-box;
+}
+
+.squareAvatar,
+.previewAvatar {
+  display: inline-grid;
+  place-items: center;
+  overflow: hidden;
+  background: $surface-muted;
+  color: $black;
+}
+
+.squareAvatar {
+  width: 100%;
+  height: 100%;
+}
+
+.previewAvatar {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 auto;
+  border: $border;
+}
+
+.avatarImage,
+.avatarFallback {
+  width: 100%;
+  height: 100%;
+}
+
+.avatarImage {
+  display: block;
+  object-fit: contain;
+}
+
+.avatarFallback {
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+}

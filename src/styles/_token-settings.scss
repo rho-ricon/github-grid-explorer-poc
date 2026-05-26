@@ -1,0 +1,54 @@
+@use 'tokens' as *;
+
+.tokenButton {
+  @include action-control;
+  font: inherit;
+}
+
+.tokenPopover {
+  width: min(360px, calc(100vw - 24px));
+  display: grid;
+  gap: 10px;
+  border: $border;
+  background: $white;
+  padding: 12px;
+  @include panel-shadow;
+  @include entering-scale;
+}
+
+.tokenTitle,
+.tokenDescription {
+  margin: 0;
+}
+
+.tokenDescription {
+  color: $text-muted;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.tokenLink {
+  width: fit-content;
+  color: $black;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tokenInput {
+  border: $border;
+  background: $white;
+  color: $black;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.rememberToken,
+.tokenActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tokenActions {
+  justify-content: flex-end;
+}

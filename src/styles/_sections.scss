@@ -1,0 +1,21 @@
+@use 'tokens' as *;
+
+.sections {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.gridSection {
+  display: grid;
+  gap: 12px;
+  border: $border;
+  padding: 16px;
+}
+
+.grid {
+  display: grid;
+  gap: 3px;
+}

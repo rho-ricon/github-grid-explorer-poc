@@ -1,0 +1,15 @@
+@use 'tokens' as *;
+
+.back,
+.actionButton {
+  @include action-control;
+
+  &:hover,
+  &:focus-visible {
+    @include action-control-hover;
+  }
+
+  &:active {
+    @include action-control-active;
+  }
+}

@@ -1,0 +1,29 @@
+@use 'tokens' as *;
+
+.preview {
+  display: grid;
+  gap: 8px;
+
+  p {
+    color: $text-muted;
+  }
+}
+
+.previewHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.meta,
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+
+  span {
+    border: 1px solid $black;
+    padding: 2px 5px;
+  }
+}

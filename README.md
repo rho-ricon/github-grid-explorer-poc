@@ -87,6 +87,7 @@ GITHUB_PAGES=true bun run build
 
 - `src/components/` — generic screen/grid primitives.
 - `src/features/github/` — GitHub data, auth, search, previews, legends, context menus, and drawer screens.
+- `src/styles.scss` and `src/styles/` — Sass entrypoint and partials for layout, grids, overlays, and shared tokens.
 - `src/utils/` — small cache/clipboard helpers.
 - `.github/workflows/deploy.yml` — GitHub Pages deployment.
 

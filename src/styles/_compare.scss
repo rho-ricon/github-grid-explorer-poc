@@ -1,0 +1,64 @@
+@use 'tokens' as *;
+
+.comparePanel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  max-width: 1040px;
+}
+
+.compareCard {
+  width: min(300px, calc(100vw - 48px));
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  border: $border;
+  padding: 16px;
+  background: $white;
+}
+
+.compareKicker {
+  display: block;
+  margin-bottom: 6px;
+  color: $text-subtle;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.compareMetrics {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.compareMetric {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid $black;
+  padding-top: 8px;
+
+  dt,
+  dd {
+    margin: 0;
+  }
+
+  dt {
+    color: $text-muted;
+  }
+
+  dd {
+    max-width: 180px;
+    text-align: right;
+  }
+}
+
+.compareSignals ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}

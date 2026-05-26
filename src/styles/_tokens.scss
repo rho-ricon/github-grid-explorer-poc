@@ -1,0 +1,80 @@
+$black: black;
+$white: white;
+$text-muted: #555;
+$text-subtle: #666;
+$neutral: #d4d4d4;
+$surface-muted: #f3f4f6;
+
+$success: #22c55e;
+$failure: #ef4444;
+$running: #facc15;
+$issue-open: black;
+$issue-closed: white;
+$pr-open: #1d4ed8;
+$pr-closed: $neutral;
+$release-stable: #16a34a;
+$release-prerelease: #a855f7;
+$release-draft: $neutral;
+$tag-version: #0f766e;
+$tag-other: $neutral;
+$team-admin: #dc2626;
+$team-maintain: #f97316;
+$team-push: #2563eb;
+$team-triage: #a855f7;
+$team-pull: #64748b;
+$team-secret: #7c3aed;
+$member-user: #111827;
+$member-bot: #0f766e;
+$site-admin: #f59e0b;
+$drop-target: #06b6d4;
+
+$border: 2px solid $black;
+$shadow: 4px 4px 0 $black;
+$square-size: 56px;
+
+@mixin focus-ring {
+  outline: 2px solid $black;
+  outline-offset: 2px;
+}
+
+@mixin panel-shadow($duration: 180ms) {
+  box-shadow: $shadow;
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity $duration ease,
+    transform $duration ease;
+}
+
+@mixin entering-scale($scale: 0.96) {
+  &[data-starting-style],
+  &[data-ending-style] {
+    opacity: 0;
+    transform: scale($scale);
+  }
+}
+
+@mixin action-control {
+  border: $border;
+  background: $white;
+  color: $black;
+  padding: 8px 12px;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background 120ms ease,
+    color 120ms ease,
+    box-shadow 120ms ease,
+    transform 120ms ease;
+}
+
+@mixin action-control-hover {
+  background: $white;
+  color: $black;
+  box-shadow: $shadow;
+  transform: translate(-2px, -2px);
+}
+
+@mixin action-control-active {
+  box-shadow: 1px 1px 0 $black;
+  transform: translate(0, 0);
+}

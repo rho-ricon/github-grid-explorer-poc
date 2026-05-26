@@ -1,0 +1,79 @@
+@use 'tokens' as *;
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    &::before {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border: 1px solid $black;
+      background: $neutral;
+    }
+  }
+}
+
+@mixin legend-color($selector, $color) {
+  .legend span#{$selector}::before {
+    background: $color;
+  }
+}
+
+@include legend-color("[data-ci='success']", $success);
+@include legend-color("[data-ci='failure']", $failure);
+@include legend-color("[data-ci='running']", $running);
+@include legend-color("[data-ci~='issue'][data-ci~='open']", $issue-open);
+@include legend-color("[data-ci~='issue'][data-ci~='closed']", $issue-closed);
+@include legend-color("[data-ci~='pr'][data-ci~='open']", $pr-open);
+@include legend-color("[data-ci~='pr'][data-ci~='closed']", $pr-closed);
+@include legend-color("[data-ci~='release'][data-ci~='stable']", $release-stable);
+@include legend-color("[data-ci~='release'][data-ci~='prerelease']", $release-prerelease);
+@include legend-color("[data-ci~='release'][data-ci~='draft']", $release-draft);
+@include legend-color("[data-ci~='tag'][data-ci~='version']", $tag-version);
+@include legend-color("[data-ci~='tag'][data-ci~='other']", $tag-other);
+@include legend-color("[data-ci~='team'][data-ci~='admin']", $team-admin);
+@include legend-color("[data-ci~='team'][data-ci~='maintain']", $team-maintain);
+@include legend-color("[data-ci~='team'][data-ci~='push']", $team-push);
+@include legend-color("[data-ci~='team'][data-ci~='triage']", $team-triage);
+@include legend-color("[data-ci~='team'][data-ci~='pull']", $team-pull);
+@include legend-color("[data-ci~='member'][data-ci~='user']", $member-user);
+@include legend-color("[data-ci~='member'][data-ci~='bot']", $member-bot);
+
+.legend span {
+  &[data-ci='stale']::before,
+  &[data-ci~='release'][data-ci~='old']::before,
+  &[data-ci~='team'][data-ci~='empty']::before {
+    opacity: 0.45;
+  }
+
+  &[data-ci='busy']::before {
+    outline: 2px solid $failure;
+    outline-offset: -4px;
+  }
+
+  &[data-ci~='team'][data-ci~='secret']::before {
+    outline: 2px solid $team-secret;
+    outline-offset: -4px;
+  }
+
+  &[data-ci~='team'][data-ci~='child']::before {
+    border-style: dashed;
+  }
+
+  &[data-ci~='team'][data-ci~='large']::before {
+    box-shadow: inset 0 0 0 3px rgb(255 255 255 / 65%);
+  }
+
+  &[data-ci~='member'][data-ci~='site-admin']::before {
+    outline: 2px solid $site-admin;
+    outline-offset: -4px;
+  }
+}
