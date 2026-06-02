@@ -1,7 +1,7 @@
 import { Avatar } from '@base-ui/react/avatar';
 import { ContextMenu } from '@base-ui/react/context-menu';
 import { Popover } from '@base-ui/react/popover';
-import { type DragEvent, type ReactNode, useMemo } from 'react';
+import { type CSSProperties, type DragEvent, type ReactNode, useMemo } from 'react';
 
 export function SquareGrid<T>({
   items,
@@ -30,10 +30,11 @@ export function SquareGrid<T>({
 }) {
   const popover = useMemo(() => Popover.createHandle<T>(), []);
   const columns = Math.min(10, Math.max(1, Math.ceil(Math.sqrt(items.length || 1))));
+  const gridStyle = { '--grid-columns': columns } as CSSProperties;
 
   return (
     <>
-      <div className="grid" style={{ gridTemplateColumns: `repeat(${columns}, 56px)` }}>
+      <div className="grid" style={gridStyle}>
         {items.map((item, index) => {
           const text = getLabel(item);
           const image = getImage?.(item);
