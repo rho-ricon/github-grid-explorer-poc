@@ -36,7 +36,11 @@ export function TeamScreen({ team }: { team: Team }) {
         count={members.loading ? 'Loading members…' : `${filteredMembers.length} members`}
       >
         <div className="sections">
-          <GridSection title="Members" empty={members.error || 'No matching members.'}>
+          <GridSection
+            title="Members"
+            empty={members.error || 'No matching members.'}
+            squareCount={filteredMembers.length}
+          >
             {members.loading ? (
               <p>Loading…</p>
             ) : (
@@ -50,6 +54,7 @@ export function TeamScreen({ team }: { team: Team }) {
                     getStatus={memberSquareStatus}
                     getImage={(member) => githubAvatarUrl(member.avatar_url, 56)}
                     onPick={(member) => openInGitHub(member.html_url)}
+                    opensExternal
                     renderPreview={(member) => <MemberPreview member={member} />}
                     renderContextMenu={(member) => <MemberContextMenu member={member} />}
                   />

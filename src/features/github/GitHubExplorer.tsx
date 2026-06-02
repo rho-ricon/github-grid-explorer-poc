@@ -153,7 +153,11 @@ export function GitHubExplorer() {
         }
       >
         <div className="sections">
-          <GridSection title="Repos" empty={repos.error || 'No matching repos.'}>
+          <GridSection
+            title="Repos"
+            empty={repos.error || 'No matching repos.'}
+            squareCount={filteredRepos.length}
+          >
             {repos.loading ? (
               <p>Loading…</p>
             ) : (
@@ -177,7 +181,11 @@ export function GitHubExplorer() {
             )}
           </GridSection>
 
-          <GridSection title="Teams" empty={teams.error || 'No matching teams.'}>
+          <GridSection
+            title="Teams"
+            empty={teams.error || 'No matching teams.'}
+            squareCount={filteredTeams.length}
+          >
             {teams.loading ? (
               <p>Loading…</p>
             ) : (
@@ -200,7 +208,11 @@ export function GitHubExplorer() {
             )}
           </GridSection>
 
-          <GridSection title="Members" empty={members.error || 'No matching members.'}>
+          <GridSection
+            title="Members"
+            empty={members.error || 'No matching members.'}
+            squareCount={filteredMembers.length}
+          >
             {members.loading ? (
               <p>Loading…</p>
             ) : (
@@ -214,6 +226,7 @@ export function GitHubExplorer() {
                     getStatus={memberSquareStatus}
                     getImage={(member) => githubAvatarUrl(member.avatar_url, 56)}
                     onPick={(member) => openInGitHub(member.html_url)}
+                    opensExternal
                     onDragStart={(member) => setDragged(memberToPouchItem(member))}
                     onDragEnd={() => setDragged(null)}
                     renderPreview={(member) => <MemberPreview member={member} />}

@@ -1,6 +1,7 @@
 @use 'tokens' as *;
 
 .square {
+  position: relative;
   width: $square-size;
   height: $square-size;
   box-sizing: border-box;
@@ -103,6 +104,25 @@
   width: $square-size;
   height: $square-size;
   box-sizing: border-box;
+}
+
+.externalBadge {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  color: $black;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 120ms ease;
+  pointer-events: none;
+}
+
+.square:hover .externalBadge,
+.square:focus-visible .externalBadge,
+.square[data-popup-open] .externalBadge {
+  opacity: 1;
 }
 
 .squareAvatar,

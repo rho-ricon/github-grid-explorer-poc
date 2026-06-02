@@ -118,6 +118,7 @@ export function RepoScreen({
             <GridSection
               title="Workflow Runs"
               empty={workflowRunData.error || 'No matching workflow runs.'}
+              squareCount={workflowRuns.length}
             >
               {workflowRunData.loading ? (
                 <p>Loading…</p>
@@ -133,6 +134,7 @@ export function RepoScreen({
                       }
                       getStatus={workflowRunSquareStatus}
                       onPick={(run) => openInGitHub(run.html_url)}
+                      opensExternal
                       renderPreview={(run) => <WorkflowRunPreview run={run} />}
                       renderContextMenu={(run) => <WorkflowRunContextMenu run={run} />}
                     />
@@ -141,7 +143,11 @@ export function RepoScreen({
               )}
             </GridSection>
 
-            <GridSection title="Issues" empty={issueData.error || 'No matching issues.'}>
+            <GridSection
+              title="Issues"
+              empty={issueData.error || 'No matching issues.'}
+              squareCount={issues.length}
+            >
               {issueData.loading ? (
                 <p>Loading…</p>
               ) : (
@@ -167,7 +173,11 @@ export function RepoScreen({
               )}
             </GridSection>
 
-            <GridSection title="Pull Requests" empty={issueData.error || 'No matching PRs.'}>
+            <GridSection
+              title="Pull Requests"
+              empty={issueData.error || 'No matching PRs.'}
+              squareCount={pullRequests.length}
+            >
               {issueData.loading ? (
                 <p>Loading…</p>
               ) : (
@@ -194,7 +204,11 @@ export function RepoScreen({
               )}
             </GridSection>
 
-            <GridSection title="Releases" empty={releaseData.error || 'No matching releases.'}>
+            <GridSection
+              title="Releases"
+              empty={releaseData.error || 'No matching releases.'}
+              squareCount={releases.length}
+            >
               {releaseData.loading ? (
                 <p>Loading…</p>
               ) : (
@@ -207,6 +221,7 @@ export function RepoScreen({
                       getLabel={(release) => release.name || release.tag_name}
                       getStatus={releaseSquareStatus}
                       onPick={(release) => openInGitHub(release.html_url)}
+                      opensExternal
                       renderPreview={(release) => <ReleasePreview release={release} />}
                       renderContextMenu={(release) => <ReleaseContextMenu release={release} />}
                     />
@@ -215,7 +230,11 @@ export function RepoScreen({
               )}
             </GridSection>
 
-            <GridSection title="Tags" empty={tagData.error || 'No matching tags.'}>
+            <GridSection
+              title="Tags"
+              empty={tagData.error || 'No matching tags.'}
+              squareCount={tags.length}
+            >
               {tagData.loading ? (
                 <p>Loading…</p>
               ) : (
@@ -228,6 +247,7 @@ export function RepoScreen({
                       getLabel={(tag) => tag.name}
                       getStatus={tagSquareStatus}
                       onPick={(tag) => openInGitHub(tagUrl(repo, tag))}
+                      opensExternal
                       renderPreview={(tag) => <TagPreview repo={repo} tag={tag} />}
                       renderContextMenu={(tag) => <TagContextMenu repo={repo} tag={tag} />}
                     />

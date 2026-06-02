@@ -1,26 +1,41 @@
 @use 'tokens' as *;
 
 .sections {
-  display: flex;
-  align-items: flex-start;
+  width: min(100%, 1160px);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, $square-size);
+  grid-auto-rows: 28px;
+  grid-auto-flow: dense;
   justify-content: center;
-  gap: 32px;
-  flex-wrap: wrap;
-  max-width: 100%;
+  align-items: start;
+  gap: 12px;
 }
 
 .gridSection {
+  grid-column: span var(--section-column-span);
+  grid-row: span var(--section-row-span);
+  width: 100%;
+  height: 100%;
   max-width: 100%;
   display: grid;
+  align-content: start;
+  justify-items: center;
   gap: 12px;
+  overflow: hidden;
   border: $border;
   box-sizing: border-box;
   padding: 16px;
 }
 
+.gridSection h2,
+.gridSection p {
+  justify-self: stretch;
+}
+
 .grid {
+  width: 100%;
   display: grid;
-  grid-template-columns: repeat(var(--grid-columns), $square-size);
+  grid-template-columns: repeat(auto-fit, $square-size);
   justify-content: center;
   gap: 3px;
   max-width: 100%;
@@ -28,15 +43,22 @@
 
 @media (max-width: 720px) {
   .sections {
+    width: 100%;
     display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+    grid-auto-flow: row;
     justify-items: stretch;
     gap: 20px;
-    width: 100%;
   }
 
   .gridSection {
+    grid-column: auto;
+    grid-row: auto;
     width: 100%;
+    height: auto;
     justify-items: center;
+    overflow: visible;
     padding: 12px;
   }
 

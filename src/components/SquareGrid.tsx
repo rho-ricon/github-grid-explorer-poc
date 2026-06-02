@@ -10,6 +10,7 @@ export function SquareGrid<T>({
   getStatus,
   getImage,
   onPick,
+  opensExternal,
   onDragStart,
   onDragEnd,
   onDrop,
@@ -22,6 +23,7 @@ export function SquareGrid<T>({
   getStatus?: (item: T) => string;
   getImage?: (item: T) => string | undefined;
   onPick?: (item: T) => void;
+  opensExternal?: boolean;
   onDragStart?: (item: T, event: DragEvent<HTMLElement>) => void;
   onDragEnd?: (item: T, event: DragEvent<HTMLElement>) => void;
   onDrop?: (item: T, event: DragEvent<HTMLElement>) => void;
@@ -38,6 +40,7 @@ export function SquareGrid<T>({
         {items.map((item, index) => {
           const text = getLabel(item);
           const image = getImage?.(item);
+          const externalHint = opensExternal ? ' (opens external link)' : '';
           const square = (
             <Popover.Trigger
               className="square"
@@ -45,9 +48,10 @@ export function SquareGrid<T>({
               data-image={image ? 'true' : undefined}
               data-draggable={onDragStart ? 'true' : undefined}
               data-droppable={onDrop ? 'true' : undefined}
+              data-external={opensExternal ? 'true' : undefined}
               draggable={Boolean(onDragStart)}
-              aria-label={`${label}: ${text}`}
-              title={text}
+              aria-label={`${label}: ${text}${externalHint}`}
+              title={`${text}${externalHint}`}
               handle={popover}
               payload={item}
               openOnHover
@@ -86,6 +90,11 @@ export function SquareGrid<T>({
                     {fallbackText(text)}
                   </Avatar.Fallback>
                 </Avatar.Root>
+              )}
+              {opensExternal && (
+                <span className="externalBadge" aria-hidden="true">
+                  ↗
+                </span>
               )}
             </Popover.Trigger>
           );
